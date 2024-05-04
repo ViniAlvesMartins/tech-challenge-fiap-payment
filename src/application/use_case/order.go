@@ -26,5 +26,5 @@ func (o *OrderUseCase) GetById(id int) (*entity.Order, error) {
 		return nil, err
 	}
 
-	return order, nil
+	return &order, nil
 }

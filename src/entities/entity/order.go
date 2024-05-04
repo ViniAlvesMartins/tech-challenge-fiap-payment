@@ -12,7 +12,6 @@ type Order struct {
 	StatusOrder enum.StatusOrder `json:"status_order"`
 	Amount      float32          `json:"amount"`
 	CreatedAt   time.Time        `json:"created_at,omitempty"`
-	Products    []*Product       `json:"products" gorm:"many2many:orders_products"`
 }
 
 func (o *Order) SetAmount(amount float32) {

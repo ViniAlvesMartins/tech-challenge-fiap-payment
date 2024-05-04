@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"go.mongodb.org/mongo-driver/mongo"
-	"gorm.io/gorm"
 	"log/slog"
 
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/entity"
@@ -46,13 +45,14 @@ func (p *PaymentRepository) Create(payment entity.Payment) (*entity.Payment, err
 }
 
 func (p *PaymentRepository) GetLastPaymentStatus(orderId int) (*entity.Payment, error) {
-	var payment entity.Payment
+	/*	var payment entity.Payment
 
-	result := p.db.Order("payments.created_at desc").Where("payments.order_id= ?", orderId).Find(&payment)
+		result := p.db.Order("payments.created_at desc").Where("payments.order_id= ?", orderId).Find(&payment)
 
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, nil
-	}
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
 
-	return &payment, nil
+		return &payment, nil*/
+	return nil, nil
 }
