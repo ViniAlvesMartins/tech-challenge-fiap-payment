@@ -21,12 +21,12 @@ type App struct {
 
 func NewApp(logger *slog.Logger,
 	paymentUseCase contract.PaymentUseCase,
-	orderUseCase contract.OrderUseCase
+	orderUseCase contract.OrderUseCase,
 ) *App {
 	return &App{
 		logger:         logger,
 		paymentUseCase: paymentUseCase,
-		orderUseCase: orderUseCase,
+		orderUseCase:   orderUseCase,
 	}
 }
 
