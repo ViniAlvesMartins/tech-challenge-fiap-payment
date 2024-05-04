@@ -1,0 +1,641 @@
+definitions:
+  controller.Response:
+    properties:
+      data: {}
+      error:
+        example: ""
+        type: string
+    type: object
+  input.ClientDto:
+    properties:
+      cpf:
+        type: integer
+      email:
+        type: string
+      name:
+        type: string
+    required:
+    - cpf
+    - email
+    - name
+    type: object
+  input.OrderDto:
+    properties:
+      client_id:
+        type: integer
+      products:
+        items:
+          properties:
+            id:
+              type: integer
+          type: object
+        type: array
+    type: object
+  input.PaymentDto:
+    properties:
+      type:
+        type: string
+    required:
+    - type
+    type: object
+  input.ProductDto:
+    properties:
+      category_id:
+        type: integer
+      description:
+        type: string
+      name_product:
+        type: string
+      price:
+        type: number
+    required:
+    - category_id
+    - description
+    - name_product
+    - price
+    type: object
+  input.StatusOrderDto:
+    properties:
+      status:
+        type: string
+    required:
+    - status
+    type: object
+  output.ClientDto:
+    properties:
+      cpf:
+        type: integer
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  output.OrderDto:
+    properties:
+      amount:
+        type: number
+      client_id:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      products:
+        items:
+          $ref: '#/definitions/output.ProductDto'
+        type: array
+      status_order:
+        type: string
+    type: object
+  output.ProductDto:
+    properties:
+      active:
+        type: boolean
+      category_id:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+      name_product:
+        type: string
+      price:
+        type: number
+    type: object
+  swagger.InternalServerErrorResponse:
+    properties:
+      data: {}
+      error:
+        example: Internal server error
+        type: string
+    type: object
+  swagger.ResourceNotFoundResponse:
+    properties:
+      data: {}
+      error:
+        example: Resource not found
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Ze Burguer APIs
+  version: "1.0"
+paths:
+  /categories/{id}/products:
+    get:
+      consumes:
+      - application/json
+      description: List products from a certain category
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controller.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/output.ProductDto'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.InternalServerErrorResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: List product by category
+      tags:
+      - Products
+  /clients:
+    get:
+      consumes:
+      - application/json
+      description: Get client by cpf
+      parameters:
+      - description: Client cpf
+        in: query
+        name: cpf
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controller.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/output.ClientDto'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.ResourceNotFoundResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.InternalServerErrorResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Show client details
+      tags:
+      - Clients
+    post:
+      consumes:
+      - application/json
+      description: Add new client
+      parameters:
+      - description: Client properties
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/input.ClientDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/controller.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/output.ClientDto'
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.ResourceNotFoundResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Create client
+      tags:
+      - Clients
+  /orders:
+    get:
+      description: List orders by status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controller.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/output.OrderDto'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.InternalServerErrorResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: List orders
+      tags:
+      - Orders
+    post:
+      consumes:
+      - application/json
+      description: Place a new order
+      parameters:
+      - description: Order properties
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/input.OrderDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/controller.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/output.OrderDto'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.ResourceNotFoundResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.InternalServerErrorResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Create order
+      tags:
+      - Orders
+  /orders/{id}:
+    get:
+      description: Find order by id
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controller.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/output.OrderDto'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.ResourceNotFoundResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.InternalServerErrorResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Find order
+      tags:
+      - Orders
+    patch:
+      description: Find order by id
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Order status
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/input.StatusOrderDto'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.ResourceNotFoundResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.InternalServerErrorResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Find order
+      tags:
+      - Orders
+  /orders/{id}/notification-payments:
+    post:
+      consumes:
+      - application/json
+      description: Payment confirmation webhook
+      parameters:
+      - description: Payment properties
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/input.PaymentDto'
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.ResourceNotFoundResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.InternalServerErrorResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Payment confirmation webhook
+      tags:
+      - Payments
+  /orders/{id}/payments:
+    post:
+      consumes:
+      - application/json
+      description: Start payment process for a certain order
+      parameters:
+      - description: Payment properties
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/input.PaymentDto'
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/controller.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.ResourceNotFoundResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.InternalServerErrorResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Start payment process
+      tags:
+      - Payments
+  /orders/{id}/status-payment:
+    get:
+      consumes:
+      - application/json
+      description: Get status for order last payment try
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controller.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.InternalServerErrorResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Get status for last payment
+      tags:
+      - Payments
+  /products:
+    post:
+      consumes:
+      - application/json
+      description: Place a new product
+      parameters:
+      - description: Product properties
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/input.ProductDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controller.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/output.ProductDto'
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.InternalServerErrorResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Create product
+      tags:
+      - Products
+  /products/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove product from list
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.InternalServerErrorResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Delete product
+      tags:
+      - Products
+    put:
+      consumes:
+      - application/json
+      description: Update product properties
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Product properties
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/input.ProductDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controller.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/output.ProductDto'
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.InternalServerErrorResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Update product
+      tags:
+      - Products
+swagger: "2.0"

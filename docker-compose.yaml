@@ -1,0 +1,45 @@
+version: '3.9'
+
+services:
+  postgres:
+    container_name: postgres.ze-burguer.dev
+    image: postgres:latest
+    env_file: .env
+    environment:
+      POSTGRES_DB: $DATABASE_NAME
+      POSTGRES_USER: $DATABASE_USERNAME
+      POSTGRES_PASSWORD: $DATABASE_PASSWORD
+    volumes:
+      - postgres_data:/data/postgres
+    ports:
+      - 5432:5432
+    networks:
+      - dev-networks
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME} -d ${DATABASE_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  dev-app:
+    container_name: app.ze-burger.dev
+    env_file: .env
+    build:
+      dockerfile: ./infra/local/Dockerfile
+      context: ./
+    volumes:
+      - .:/app
+    ports:
+      - 8080:8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dev-networks
+
+volumes:
+  postgres_data:
+
+networks:
+  dev-networks:
+    driver: bridge
+  
