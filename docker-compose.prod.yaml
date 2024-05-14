@@ -1,6 +1,6 @@
 services:
-  postgres:
-    container_name: postgres.ze-burguer
+  payment-postgres:
+    container_name: postgres.ze-burguer-payment
     image: postgres:latest
     env_file:
       - .env
@@ -17,7 +17,7 @@ services:
       retries: 5
     networks:
       - fullstack
-  app-ze-burguer:
+  app-ze-burguer-payment:
     build:
       dockerfile: ./infra/prod/Dockerfile
       context: .
@@ -30,10 +30,6 @@ services:
         condition: service_healthy
     networks:
       - fullstack
-
-
-volumes:
-  postgres_data:
 
 networks:
   fullstack:

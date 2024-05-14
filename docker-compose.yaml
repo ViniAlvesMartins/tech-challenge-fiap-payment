@@ -1,8 +1,8 @@
 version: '3.9'
 
 services:
-  postgres:
-    container_name: postgres.ze-burguer.dev
+  payment-postgres:
+    container_name: postgres.ze-burguer-payment.dev
     image: postgres:latest
     env_file: .env
     environment:
@@ -10,9 +10,9 @@ services:
       POSTGRES_USER: $DATABASE_USERNAME
       POSTGRES_PASSWORD: $DATABASE_PASSWORD
     volumes:
-      - postgres_data:/data/postgres
+      - payment_postgres_data:/data/postgres
     ports:
-      - 5432:5432
+      - 5433:5432
     networks:
       - dev-networks
     healthcheck:
@@ -20,8 +20,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-  dev-app:
-    container_name: app.ze-burger.dev
+  payment-dev-app:
+    container_name: app.ze-burger-payment.dev
     env_file: .env
     build:
       dockerfile: ./infra/local/Dockerfile
@@ -29,15 +29,15 @@ services:
     volumes:
       - .:/app
     ports:
-      - 8080:8080
+      - 8081:8080
     depends_on:
-      postgres:
+      payment-postgres:
         condition: service_healthy
     networks:
       - dev-networks
 
 volumes:
-  postgres_data:
+  payment_postgres_data:
 
 networks:
   dev-networks:

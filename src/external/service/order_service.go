@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	responseorderservice "github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/modules/response/order_service"
 	"github.com/go-resty/resty/v2"
@@ -31,7 +32,7 @@ func (o *OrderService) GetById(id int) (*responseorderservice.GetByIdResp, error
 
 	if resp.IsError() {
 		o.logger.Error("request response error", slog.Int("error_status_code", resp.StatusCode()))
-		return nil, err
+		return nil, errors.New("request response error")
 	}
 
 	return &order, nil
