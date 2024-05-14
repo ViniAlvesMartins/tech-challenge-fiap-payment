@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/infra"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/use_case"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/external/database/mongodb"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/external/handler/http_server"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/external/repository"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/external/service"
+	"github.com/go-resty/resty/v2"
 	"log/slog"
 	"os"
 )
@@ -33,9 +33,9 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(db)
+	ordersHTTPClient := loadOrdersHttpClient(cfg.OrdersURL)
 
-	orderService := service.NewOrderService()
+	orderService := service.NewOrderService(ordersHTTPClient, logger)
 	orderUseCase := use_case.NewOrderUseCase(orderService, logger)
 
 	paymentRepository := repository.NewPaymentRepository(db, logger)
@@ -58,4 +58,8 @@ func loadConfig() (infra.Config, error) {
 
 func loadLogger() *slog.Logger {
 	return slog.New(slog.NewTextHandler(os.Stderr, nil))
+}
+
+func loadOrdersHttpClient(ordersURL string) *resty.Client {
+	return resty.New().SetBaseURL(ordersURL)
 }

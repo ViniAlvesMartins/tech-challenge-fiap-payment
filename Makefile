@@ -11,7 +11,10 @@ mocks:
 	docker-compose run dev-app go generate ./...
 
 test:
-	docker-compose run dev-app go test -v ./...
+	docker-compose run dev-app go test `go list ./... | grep -v mock`
+
+test-coverage:
+	docker-compose run dev-app go test `go list ./... | grep -v mock` -coverprofile cover.out  && go tool cover -html=cover.out
 
 run-test:
 	$(MAKE) mocks && $(MAKE) test
