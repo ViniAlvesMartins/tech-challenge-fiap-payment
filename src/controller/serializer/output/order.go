@@ -1,9 +1,18 @@
 package output
 
 import (
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/entity"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
 	"time"
 )
+
+type Order struct {
+	ID          int              `json:"id" gorm:"primaryKey;autoIncrement"`
+	ClientId    *int             `json:"client_id"`
+	StatusOrder enum.StatusOrder `json:"status_order"`
+	Amount      float32          `json:"amount"`
+	CreatedAt   time.Time        `json:"created_at,omitempty"`
+	Products    []*Product       `json:"products" gorm:"many2many:orders_products"`
+}
 
 type OrderDto struct {
 	ID          int          `json:"id"`
@@ -14,7 +23,7 @@ type OrderDto struct {
 	Products    []ProductDto `json:"products"`
 }
 
-func OrderFromEntity(order entity.Order) OrderDto {
+func OrderFromEntity(order Order) OrderDto {
 	var orderDto = OrderDto{
 		ID:          order.ID,
 		ClientID:    order.ClientId,
@@ -30,7 +39,7 @@ func OrderFromEntity(order entity.Order) OrderDto {
 	return orderDto
 }
 
-func OrderListFromEntity(orders []entity.Order) []OrderDto {
+func OrderListFromEntity(orders []Order) []OrderDto {
 	var ordersDto []OrderDto
 	for _, o := range orders {
 		ordersDto = append(ordersDto, OrderFromEntity(o))

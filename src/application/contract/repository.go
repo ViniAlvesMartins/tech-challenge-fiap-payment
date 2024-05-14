@@ -2,7 +2,7 @@
 package contract
 
 import (
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/entity"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
 )
 
 type PaymentRepository interface {

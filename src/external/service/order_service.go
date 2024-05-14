@@ -3,7 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
-	responseorderservice "github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/modules/response/order_service"
+	responseorderservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/order_service"
 	"github.com/go-resty/resty/v2"
 	"log/slog"
 )

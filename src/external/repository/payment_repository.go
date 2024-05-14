@@ -6,7 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"log/slog"
 
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/entity"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
 )
 
 type PaymentRepository struct {

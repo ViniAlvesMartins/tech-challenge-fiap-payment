@@ -2,14 +2,14 @@ package controller
 
 import (
 	"encoding/json"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/enum"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
 	"strconv"
 
 	"github.com/gorilla/mux"
 
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/contract"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/controller/serializer"
-	dto "github.com/ViniAlvesMartins/tech-challenge-fiap/src/controller/serializer/input"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/contract"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/controller/serializer"
+	dto "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/controller/serializer/input"
 	"log/slog"
 	"net/http"
 )

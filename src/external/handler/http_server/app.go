@@ -5,9 +5,9 @@ import (
 	"log/slog"
 	"net/http"
 
-	_ "github.com/ViniAlvesMartins/tech-challenge-fiap/doc/swagger"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/contract"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/controller/controller"
+	_ "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/doc/swagger"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/contract"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/controller/controller"
 	"github.com/swaggo/http-swagger/v2"
 
 	"github.com/gorilla/mux"

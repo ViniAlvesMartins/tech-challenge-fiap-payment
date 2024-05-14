@@ -3,7 +3,7 @@ package mongodb
 import (
 	"context"
 	"fmt"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/infra"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/infra"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )

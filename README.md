@@ -92,7 +92,7 @@ uma vasta quantidade de tipos de dados; suporte nativo a UUID(identificador úni
 Clone o projeto
 
 ```bash
-  git clone https://github.com/ViniAlvesMartins/tech-challenge-fiap.git
+  git clone https://github.com/ViniAlvesMartins/tech-challenge-fiap-payment.git
 ```
 
 Entre no diretório do projeto

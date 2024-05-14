@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/infra"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/use_case"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/external/database/mongodb"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/external/handler/http_server"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/external/repository"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/external/service"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/infra"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/use_case"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/database/mongodb"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/handler/http_server"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/repository"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/service"
 	"github.com/go-resty/resty/v2"
 	"log/slog"
 	"os"

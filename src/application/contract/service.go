@@ -2,9 +2,9 @@
 package contract
 
 import (
-	responseorderservice "github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/modules/response/order_service"
-	responsepaymentservice "github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/modules/response/payment_service"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/entity"
+	responseorderservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/order_service"
+	responsepaymentservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/payment_service"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
 )
 
 type ExternalPaymentService interface {

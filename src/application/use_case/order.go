@@ -1,8 +1,8 @@
 package use_case
 
 import (
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/contract"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/entity"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/contract"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
 	"log/slog"
 )
 

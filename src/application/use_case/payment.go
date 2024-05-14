@@ -1,12 +1,13 @@
 package use_case
 
 import (
+	"fmt"
 	"log/slog"
 
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/contract"
-	response_payment_service "github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/modules/response/payment_service"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/entity"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/enum"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/contract"
+	response_payment_service "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/payment_service"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
 )
 
 type PaymentUseCase struct {
@@ -51,7 +52,7 @@ func (p *PaymentUseCase) CreateQRCode(order *entity.Order) (*response_payment_se
 	}
 
 	if lastPaymentStatus == enum.CONFIRMED {
-		p.logger.Error("Last payment status: %v", lastPaymentStatus)
+		p.logger.Error(fmt.Sprintf("Last payment status: %s", lastPaymentStatus))
 		return nil, nil
 	}
 
