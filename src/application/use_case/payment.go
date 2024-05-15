@@ -25,7 +25,10 @@ func NewPaymentUseCase(r contract.PaymentRepository, e contract.ExternalPaymentS
 }
 
 func (p *PaymentUseCase) Create(payment *entity.Payment) error {
-	p.repository.Create(*payment)
+	if _, err := p.repository.Create(*payment); err != nil {
+		return err
+	}
+
 	return nil
 }
 
