@@ -5,7 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/contract"
-	response_payment_service "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/payment_service"
+	responsepaymentservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/payment_service"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
 )
@@ -30,7 +30,6 @@ func (p *PaymentUseCase) Create(payment *entity.Payment) error {
 }
 
 func (p *PaymentUseCase) GetLastPaymentStatus(orderId int) (enum.PaymentStatus, error) {
-
 	payment, err := p.repository.GetLastPaymentStatus(orderId)
 
 	if err != nil && payment != nil {
@@ -44,7 +43,7 @@ func (p *PaymentUseCase) GetLastPaymentStatus(orderId int) (enum.PaymentStatus, 
 	return payment.Status, nil
 }
 
-func (p *PaymentUseCase) CreateQRCode(order *entity.Order) (*response_payment_service.CreateQRCode, error) {
+func (p *PaymentUseCase) CreateQRCode(order *entity.Order) (*responsepaymentservice.CreateQRCode, error) {
 	lastPaymentStatus, err := p.GetLastPaymentStatus(order.ID)
 
 	if err != nil {

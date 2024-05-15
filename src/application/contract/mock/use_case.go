@@ -7,7 +7,7 @@ package mock
 import (
 	reflect "reflect"
 
-	payment_service "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/payment_service"
+	response_payment_service "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/payment_service"
 	entity "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
 	enum "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
 	gomock "github.com/golang/mock/gomock"
@@ -89,10 +89,10 @@ func (mr *MockPaymentUseCaseMockRecorder) Create(payment interface{}) *gomock.Ca
 }
 
 // CreateQRCode mocks base method.
-func (m *MockPaymentUseCase) CreateQRCode(order *entity.Order) (*payment_service.CreateQRCode, error) {
+func (m *MockPaymentUseCase) CreateQRCode(order *entity.Order) (*response_payment_service.CreateQRCode, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateQRCode", order)
-	ret0, _ := ret[0].(*payment_service.CreateQRCode)
+	ret0, _ := ret[0].(*response_payment_service.CreateQRCode)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

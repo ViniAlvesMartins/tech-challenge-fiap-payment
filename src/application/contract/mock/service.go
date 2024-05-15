@@ -7,8 +7,8 @@ package mock
 import (
 	reflect "reflect"
 
-	order_service "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/order_service"
-	payment_service "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/payment_service"
+	response_order_service "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/order_service"
+	response_payment_service "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/payment_service"
 	entity "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
 	gomock "github.com/golang/mock/gomock"
 )
@@ -37,10 +37,10 @@ func (m *MockExternalPaymentService) EXPECT() *MockExternalPaymentServiceMockRec
 }
 
 // CreateQRCode mocks base method.
-func (m *MockExternalPaymentService) CreateQRCode(payment entity.Payment) (payment_service.CreateQRCode, error) {
+func (m *MockExternalPaymentService) CreateQRCode(payment entity.Payment) (response_payment_service.CreateQRCode, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateQRCode", payment)
-	ret0, _ := ret[0].(payment_service.CreateQRCode)
+	ret0, _ := ret[0].(response_payment_service.CreateQRCode)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -75,10 +75,10 @@ func (m *MockOrderService) EXPECT() *MockOrderServiceMockRecorder {
 }
 
 // GetById mocks base method.
-func (m *MockOrderService) GetById(id int) (*order_service.GetByIdResp, error) {
+func (m *MockOrderService) GetById(id int) (*response_order_service.GetByIdResp, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetById", id)
-	ret0, _ := ret[0].(*order_service.GetByIdResp)
+	ret0, _ := ret[0].(*response_order_service.GetByIdResp)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

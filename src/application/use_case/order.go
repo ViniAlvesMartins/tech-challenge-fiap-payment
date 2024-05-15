@@ -1,6 +1,7 @@
 package use_case
 
 import (
+	"errors"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/contract"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
 	"log/slog"
@@ -22,6 +23,10 @@ func (o *OrderUseCase) GetById(id int) (*entity.Order, error) {
 	orderServiceResponse, err := o.orderService.GetById(id)
 	if err != nil {
 		return nil, err
+	}
+
+	if orderServiceResponse.Error != "" {
+		return nil, errors.New(orderServiceResponse.Error)
 	}
 
 	if len(orderServiceResponse.Data) == 0 {
