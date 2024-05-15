@@ -11,10 +11,13 @@ mocks:
 	docker-compose run payment-dev-app go generate ./...
 
 test:
-	docker-compose run payment-dev-app go test `go list ./... | grep -v -e mock -e doc -e infra`
+	docker-compose run payment-dev-app go test ./...
 
 test-coverage:
-	docker-compose run payment-dev-app go test `go list ./... | grep -v -e mock -e doc -e infra` -coverprofile cover.out  && go tool cover -html=cover.out
+	docker-compose run payment-dev-app go test -coverprofile cover.out `go list ./... | egrep -v '(/doc|/infra|/src/external/handler/http_server)$\'` && go tool cover -html=cover.out
+
+get-coverage:
+	docker-compose run -d payment-dev-app go test -coverprofile cover.out `go list ./... | egrep -v '(/doc|/infra|/src/external/handler/http_server)$\')` && go tool cover -func cover.out | fgrep total | awk '{print substr($$3, 1, length($$3)-1)}'
 
 run-test:
 	$(MAKE) mocks && $(MAKE) test
