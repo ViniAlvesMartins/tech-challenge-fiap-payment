@@ -44,16 +44,16 @@ func (p *PaymentUseCase) GetLastPaymentStatus(orderId int) (enum.PaymentStatus, 
 }
 
 func (p *PaymentUseCase) CreateQRCode(order *entity.Order) (*response_payment_service.CreateQRCode, error) {
-	lastPaymentStatus, err := p.GetLastPaymentStatus(order.ID)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if lastPaymentStatus == enum.CONFIRMED {
-		p.logger.Error("Last payment status: %v", lastPaymentStatus)
-		return nil, nil
-	}
+	//lastPaymentStatus, err := p.GetLastPaymentStatus(order.ID)
+	//
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//if lastPaymentStatus == enum.CONFIRMED {
+	//	p.logger.Error("Last payment status: %v", lastPaymentStatus)
+	//	return nil, nil
+	//}
 
 	payment := &entity.Payment{
 		Type:   enum.QRCODE,

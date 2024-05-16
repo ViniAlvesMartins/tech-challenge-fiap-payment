@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/enum"
 	"strconv"
 
@@ -49,21 +50,7 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 	var paymentDTO dto.PaymentDto
 	var response Response
 
-	orderIdParam := mux.Vars(r)["orderId"]
-	orderId, err := strconv.Atoi(orderIdParam)
-	if err != nil {
-		p.logger.Error("error to convert id order to int", slog.Any("error", err.Error()))
-
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(
-			Response{
-				Error: "Order id must be an integer",
-				Data:  nil,
-			})
-		return
-	}
-
-	if err = json.NewDecoder(r.Body).Decode(&paymentDTO); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&paymentDTO); err != nil {
 		p.logger.Error("Unable to decode the request body.  %v", slog.Any("error", err))
 
 		w.WriteHeader(http.StatusInternalServerError)
@@ -87,31 +74,14 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	order, err := p.orderUseCase.GetById(orderId)
-
-	if err != nil {
-		p.logger.Error("error getting order", slog.Any("error", err.Error()))
-
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(
-			Response{
-				Error: "Error getting order details",
-				Data:  nil,
-			})
-		return
+	order := entity.Order{
+		ID:          1,
+		Amount:      1,
+		StatusOrder: enum.RECEIVED,
 	}
 
-	if order == nil {
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(
-			Response{
-				Error: "Order not found",
-				Data:  nil,
-			})
-		return
-	}
+	qrCode, err := p.paymentUseCase.CreateQRCode(&order)
 
-	qrCode, err := p.paymentUseCase.CreateQRCode(order)
 	if err != nil {
 		p.logger.Error("error creating qr code", slog.Any("error", err.Error()))
 

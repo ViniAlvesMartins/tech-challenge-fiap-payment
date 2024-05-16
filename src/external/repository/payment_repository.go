@@ -1,45 +1,45 @@
 package repository
 
 import (
-	"context"
-	"errors"
-	"go.mongodb.org/mongo-driver/mongo"
-	"log/slog"
-
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/entity"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"log/slog"
 )
 
 type PaymentRepository struct {
-	db  *mongo.Database
+	db  *dynamodb.Client
 	log *slog.Logger
 }
 
-func NewPaymentRepository(db *mongo.Database, log *slog.Logger) *PaymentRepository {
+func NewPaymentRepository(db *dynamodb.Client, log *slog.Logger) *PaymentRepository {
 	return &PaymentRepository{
 		db:  db,
 		log: log,
 	}
 }
 
+type Item struct {
+	Id      string `json:"pk"`
+	OrderId string `json:"sk"`
+	Type    string `json:"type"`
+	Status  string `json:"status"`
+	Amount  string `json:"amount"`
+}
+
 func (p *PaymentRepository) Create(payment entity.Payment) (*entity.Payment, error) {
 
-	collection_name := "payments"
+	//input := &dynamodb.PutItemInput{
+	//	Item: map[string]types.AttributeValue{
+	//		"id":      &types.AttributeValueMemberS{Value: id},
+	//		"orderID": &types.AttributeValueMemberN{Value: uuid.New().String()},
+	//		"type":    &types.AttributeValueMemberS{Value: uuid.New().String()},
+	//		"status":  &types.AttributeValueMemberS{Value: uuid.New().String()},
+	//		"amount":  &types.AttributeValueMemberS{Value: uuid.New().String()},
+	//	},
+	//	TableName: aws.String(table),
+	//}
 
-	collection := p.db.Collection(collection_name)
-
-	value, err := payment.GetJSONValue()
-
-	if err != nil {
-		return nil, errors.New("Error convert domain from JSON")
-	}
-
-	result, err := collection.InsertOne(context.Background(), value)
-
-	if err != nil {
-		return &payment, errors.New("create payment from repository has failed")
-	}
-
-	payment.ID = result.InsertedID.(string)
+	//out, err := p.db.PutItem(context.TODO(), input)
 
 	return &payment, nil
 }

@@ -1,25 +1,13 @@
 version: '3.9'
 
 services:
-  postgres:
-    container_name: postgres.ze-burguer.dev
-    image: postgres:latest
-    env_file: .env
-    environment:
-      POSTGRES_DB: $DATABASE_NAME
-      POSTGRES_USER: $DATABASE_USERNAME
-      POSTGRES_PASSWORD: $DATABASE_PASSWORD
-    volumes:
-      - postgres_data:/data/postgres
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    container_name: dynamodb-local
     ports:
-      - 5432:5432
+      - "8000:8000"
     networks:
       - dev-networks
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME} -d ${DATABASE_NAME}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
   dev-app:
     container_name: app.ze-burger.dev
     env_file: .env
@@ -29,15 +17,10 @@ services:
     volumes:
       - .:/app
     ports:
-      - 8080:8080
-    depends_on:
-      postgres:
-        condition: service_healthy
+      - 8081:8081
     networks:
       - dev-networks
 
-volumes:
-  postgres_data:
 
 networks:
   dev-networks:

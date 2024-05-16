@@ -4,23 +4,49 @@ import (
 	"context"
 	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/infra"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 )
 
-func NewConnection(cfg infra.Config) (*mongo.Database, error) {
+func NewConnection(conf infra.Config) (*dynamodb.Client, error) {
 
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI("mongodb://localhost:27017"))
+	cfg, err := config.LoadDefaultConfig(context.TODO(),
+		config.WithRegion("us-east-1"),
+
+		config.WithCredentialsProvider(credentials.StaticCredentialsProvider{
+			Value: aws.Credentials{
+				AccessKeyID: "local", SecretAccessKey: "local", SessionToken: "",
+				Source: "Hard-coded credentials; values are irrelevant for local DynamoDB",
+			},
+		}),
+	)
 
 	if err != nil {
 		panic(err)
 	}
 
-	if err := client.Ping(context.Background(), nil); err != nil {
-		return nil, err
+	client := dynamodb.NewFromConfig(cfg)
+
+	client.Options()
+
+	input := &dynamodb.DescribeTableInput{
+		TableName: aws.String("payments"),
 	}
 
-	fmt.Println("conectou com sucesso")
+	resp, erro := client.DescribeTable(context.TODO(), input)
 
-	return client.Database("ze_burguer_payment"), nil
+	if erro != nil {
+		fmt.Println("Got error calling DescribeTable:")
+		fmt.Println(erro)
+		fmt.Println(erro.Error())
+	} else {
+		fmt.Println("Successfully list table to table")
+		fmt.Println(resp)
+		fmt.Println(erro)
+	}
+
+	return client, nil
+
 }
