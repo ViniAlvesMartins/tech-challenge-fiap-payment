@@ -44,7 +44,7 @@ func NewPaymentController(p contract.PaymentUseCase, logger *slog.Logger, orderU
 // @Success      201  {object}  Response{data=string}
 // @Failure      500  {object}  swagger.InternalServerErrorResponse{data=interface{}}
 // @Failure      404  {object}  swagger.ResourceNotFoundResponse{data=interface{}}
-// @Router       /orders/{id}/payments [post]
+// @Router       /payments/{id} [post]
 func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request) {
 	var paymentDTO dto.PaymentDto
 	var response Response
