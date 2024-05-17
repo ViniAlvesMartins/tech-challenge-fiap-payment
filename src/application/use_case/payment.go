@@ -33,14 +33,11 @@ func (p *PaymentUseCase) Create(payment *entity.Payment) error {
 }
 
 func (p *PaymentUseCase) GetLastPaymentStatus(orderId int) (enum.PaymentStatus, error) {
+	var status = enum.PENDING
 	payment, err := p.repository.GetLastPaymentStatus(orderId)
 
-	if err != nil && payment != nil {
-		return payment.Status, err
-	}
-
-	if payment != nil && payment.Status == "" {
-		return enum.PENDING, nil
+	if err != nil || payment == nil || payment.Status == "" {
+		return status, err
 	}
 
 	return payment.Status, nil
