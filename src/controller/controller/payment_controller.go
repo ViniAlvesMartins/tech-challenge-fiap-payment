@@ -44,27 +44,12 @@ func NewPaymentController(p contract.PaymentUseCase, logger *slog.Logger, orderU
 // @Success      201  {object}  Response{data=string}
 // @Failure      500  {object}  swagger.InternalServerErrorResponse{data=interface{}}
 // @Failure      404  {object}  swagger.ResourceNotFoundResponse{data=interface{}}
-// @Router       /payments/{id} [post]
+// @Router       /orders/{id}/payments [post]
 func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request) {
 	var paymentDTO dto.PaymentDto
 	var response Response
 
-	orderIdParam := mux.Vars(r)["orderId"]
-	orderId, err := strconv.Atoi(orderIdParam)
-	if err != nil {
-		p.logger.Error("error to convert id order to int", slog.Any("error", err.Error()))
-
-		w.WriteHeader(http.StatusInternalServerError)
-		jsonResponse, _ := json.Marshal(
-			Response{
-				Error: "Order id must be an integer",
-				Data:  nil,
-			})
-		w.Write(jsonResponse)
-		return
-	}
-
-	if err = json.NewDecoder(r.Body).Decode(&paymentDTO); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&paymentDTO); err != nil {
 		p.logger.Error("Unable to decode the request body.  %v", slog.Any("error", err))
 
 		w.WriteHeader(http.StatusInternalServerError)
@@ -89,33 +74,14 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	order, err := p.orderUseCase.GetById(orderId)
-
-	if err != nil {
-		p.logger.Error("error getting order", slog.Any("error", err.Error()))
-
-		w.WriteHeader(http.StatusBadRequest)
-		jsonResponse, _ := json.Marshal(
-			Response{
-				Error: "Error getting order details",
-				Data:  nil,
-			})
-		w.Write(jsonResponse)
-		return
+	order := entity.Order{
+		ID:          19,
+		Amount:      1,
+		StatusOrder: enum.RECEIVED,
 	}
 
-	if order == nil {
-		w.WriteHeader(http.StatusNotFound)
-		jsonResponse, _ := json.Marshal(
-			Response{
-				Error: "Order not found",
-				Data:  nil,
-			})
-		w.Write(jsonResponse)
-		return
-	}
+	qrCode, err := p.paymentUseCase.CreateQRCode(&order)
 
-	qrCode, err := p.paymentUseCase.CreateQRCode(order)
 	if err != nil {
 		p.logger.Error("error creating qr code", slog.Any("error", err.Error()))
 
@@ -162,8 +128,9 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 // @Failure      500  {object}  swagger.InternalServerErrorResponse{data=interface{}}
 // @Router       /orders/{id}/status-payment [get]
 func (p *PaymentController) GetLastPaymentStatus(w http.ResponseWriter, r *http.Request) {
-	orderIdParam := mux.Vars(r)["orderId"]
-	orderId, err := strconv.Atoi(orderIdParam)
+	paymentIdParam := mux.Vars(r)["paymentId"]
+	paymentId, err := strconv.Atoi(paymentIdParam)
+
 	if err != nil {
 		p.logger.Error("error to convert id order to int", slog.Any("error", err.Error()))
 
@@ -177,7 +144,7 @@ func (p *PaymentController) GetLastPaymentStatus(w http.ResponseWriter, r *http.
 		return
 	}
 
-	paymentStatus, err := p.paymentUseCase.GetLastPaymentStatus(orderId)
+	paymentStatus, err := p.paymentUseCase.GetLastPaymentStatus(paymentId)
 	if err != nil {
 		p.logger.Error("error getting last payment status", slog.Any("error", err.Error()))
 
@@ -197,7 +164,7 @@ func (p *PaymentController) GetLastPaymentStatus(w http.ResponseWriter, r *http.
 		Response{
 			Error: "",
 			Data: GetLastPaymentStatus{
-				OrderId:       orderId,
+				OrderId:       paymentId,
 				PaymentStatus: paymentStatus,
 			},
 		})
@@ -218,9 +185,9 @@ func (p *PaymentController) GetLastPaymentStatus(w http.ResponseWriter, r *http.
 // @Failure      500  {object}  swagger.InternalServerErrorResponse{data=interface{}}
 // @Router       /orders/{id}/notification-payments [post]
 func (p *PaymentController) Notification(w http.ResponseWriter, r *http.Request) {
-	orderIdParam := mux.Vars(r)["orderId"]
+	paymentIdParam := mux.Vars(r)["paymentId"]
 
-	orderId, err := strconv.Atoi(orderIdParam)
+	paymentId, err := strconv.Atoi(paymentIdParam)
 	if err != nil {
 		p.logger.Error("error to convert id order to int", slog.Any("error", err.Error()))
 
@@ -230,33 +197,11 @@ func (p *PaymentController) Notification(w http.ResponseWriter, r *http.Request)
 				Error: "Order id must be an integer",
 				Data:  nil,
 			})
+
 		return
 	}
 
-	order, err := p.orderUseCase.GetById(orderId)
-	if err != nil {
-		p.logger.Error("error getting order by id", slog.Any("error", err.Error()))
-
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(
-			Response{
-				Error: "Error getting order by id",
-				Data:  nil,
-			})
-		return
-	}
-
-	if order == nil {
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(
-			Response{
-				Error: "Order not found",
-				Data:  nil,
-			})
-		return
-	}
-
-	if err = p.paymentUseCase.PaymentNotification(order); err != nil {
+	if err = p.paymentUseCase.PaymentNotification(paymentId); err != nil {
 		p.logger.Error("error processing payment notification", slog.Any("error", err.Error()))
 
 		w.WriteHeader(http.StatusInternalServerError)

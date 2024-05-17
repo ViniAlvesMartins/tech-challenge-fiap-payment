@@ -4,5 +4,5 @@ import "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/ent
 
 type GetByIdResp struct {
 	Error string          `json:"error"`
-	Data  []*entity.Order `json:"data"`
+	Data  *entity.Order `json:"data"`
 }

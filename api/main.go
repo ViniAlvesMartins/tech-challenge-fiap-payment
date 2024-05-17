@@ -27,7 +27,8 @@ func main() {
 		panic(err)
 	}
 
-	db, err := mongodb.NewConnection(cfg)
+	db, err := dynamodb.NewConnection(cfg)
+
 	if err != nil {
 		logger.Error("error connecting tdo database", err)
 		panic(err)
