@@ -1,0 +1,99 @@
+name: ci-cd
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - "main"
+
+env:
+  EKS_CLUSTER_NAME: eks-ze-burguer
+  AWS_REGION: us-east-1
+  DATABASE_HOST: "zeburger-db.cpwm48q0wvgx.us-east-1.rds.amazonaws.com"
+  DATABASE_USERNAME: "zeburguer"
+  DATABASE_PORT: 5432
+  DATABASE_SCHEMA: "ze_burguer"
+  MIGRATIONS_DIR: "infra/database/migrations"
+  DATABASE_NAME: zeburguer
+
+jobs:
+  build:
+    name: Build 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./infra/prod/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ze_burguer:latest
+
+  migration:
+    name: Running DB migration
+    needs: [build]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check out
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{env.AWS_REGION}}
+
+    - name: Get Database Secret
+      uses: aws-actions/aws-secretsmanager-get-secrets@v1
+      with:
+        secret-ids: |
+          DATABASE_PASSWORD, ze_burguer_db
+
+
+    - name: Set up Migration Script
+      run: |
+        chmod +x cmd/main
+  
+    - name: Run Migration Script
+      run: |
+        ./cmd/main 
+
+  deploy:
+    name: Deploy
+    needs: [build, migration] 
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{env.AWS_REGION}}
+
+    - name: Update kube config
+      id: config-kubectl
+      run: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+
+    - name: Deploy App to EKS
+      if: steps.config-kubectl.outcome == 'success'
+      run: |
+        kubectl apply -k kustomize/

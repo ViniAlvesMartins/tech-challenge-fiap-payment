@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    networks:
+      - dev-networks
+  dev-app:
+    container_name: app.ze-burger.dev
+    env_file: .env
+    build:
+      dockerfile: ./infra/local/Dockerfile
+      context: ./
+    volumes:
+      - .:/app
+    ports:
+      - 8081:8081
+    networks:
+      - dev-networks
+
+
+networks:
+  dev-networks:
+    driver: bridge
+  
