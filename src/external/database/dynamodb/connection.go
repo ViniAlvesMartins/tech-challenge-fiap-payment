@@ -1,8 +1,7 @@
-package mongodb
+package dynamodb
 
 import (
 	"context"
-	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/infra"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -17,8 +16,7 @@ func NewConnection(conf infra.Config) (*dynamodb.Client, error) {
 
 		config.WithCredentialsProvider(credentials.StaticCredentialsProvider{
 			Value: aws.Credentials{
-				AccessKeyID: "local", SecretAccessKey: "local", SessionToken: "",
-				Source: "Hard-coded credentials; values are irrelevant for local DynamoDB",
+				AccessKeyID: "", SecretAccessKey: "",
 			},
 		}),
 	)
@@ -28,24 +26,6 @@ func NewConnection(conf infra.Config) (*dynamodb.Client, error) {
 	}
 
 	client := dynamodb.NewFromConfig(cfg)
-
-	client.Options()
-
-	input := &dynamodb.DescribeTableInput{
-		TableName: aws.String("payments"),
-	}
-
-	resp, erro := client.DescribeTable(context.TODO(), input)
-
-	if erro != nil {
-		fmt.Println("Got error calling DescribeTable:")
-		fmt.Println(erro)
-		fmt.Println(erro.Error())
-	} else {
-		fmt.Println("Successfully list table to table")
-		fmt.Println(resp)
-		fmt.Println(erro)
-	}
 
 	return client, nil
 

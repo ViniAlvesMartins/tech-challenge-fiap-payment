@@ -35,8 +35,8 @@ func (e *App) Run(ctx context.Context) error {
 
 	paymentController := controller.NewPaymentController(e.paymentUseCase, e.logger, e.orderUseCase)
 	router.HandleFunc("/payments", paymentController.CreatePayment).Methods("POST")
-	router.HandleFunc("/status-payment", paymentController.GetLastPaymentStatus).Methods("GET")
-	router.HandleFunc("/notification-payments", paymentController.Notification).Methods("POST")
+	router.HandleFunc("/payments/{paymentId:[0-9]+}/status", paymentController.GetLastPaymentStatus).Methods("GET")
+	router.HandleFunc("/payments/{paymentId:[0-9]+}/notification-payments", paymentController.Notification).Methods("POST")
 
 	router.PathPrefix("/docs").Handler(httpSwagger.WrapHandler)
 

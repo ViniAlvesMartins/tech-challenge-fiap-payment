@@ -13,6 +13,6 @@ type OrderUseCase interface {
 type PaymentUseCase interface {
 	Create(payment *entity.Payment) error
 	CreateQRCode(order *entity.Order) (*response_payment_service.CreateQRCode, error)
-	GetLastPaymentStatus(orderId int) (enum.PaymentStatus, error)
-	PaymentNotification(order *entity.Order) error
+	GetLastPaymentStatus(paymentId int) (enum.PaymentStatus, error)
+	PaymentNotification(paymentId int) error
 }

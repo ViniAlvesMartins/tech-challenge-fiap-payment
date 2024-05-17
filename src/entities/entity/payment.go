@@ -13,14 +13,14 @@ type PaymentInterface interface {
 }
 
 type Payment struct {
-	ID        string             `json:"id"`
-	OrderID   int                `json:"orderId"`
-	Type      enum.PaymentType   `json:"type"`
-	Status    enum.PaymentStatus `json:"status"`
-	Amount    float32            `json:"amount"`
-	CreatedAt *time.Time         `json:"created_at,omitempty"`
-	UpdatedAt *time.Time         `json:"updated_at,omitempty"`
-	DeletedAt *time.Time         `json:"deleted_at,omitempty"`
+	PaymentID    string             `json:"paymentId"`
+	OrderID      int                `json:"orderId"`
+	Type         enum.PaymentType   `json:"type"`
+	CurrentState enum.PaymentStatus `json:"status"`
+	Amount       float32            `json:"amount"`
+	CreatedAt    *time.Time         `json:"created_at,omitempty"`
+	UpdatedAt    *time.Time         `json:"updated_at,omitempty"`
+	DeletedAt    *time.Time         `json:"deleted_at,omitempty"`
 }
 
 func (p *Payment) GetJSONValue() (string, error) {

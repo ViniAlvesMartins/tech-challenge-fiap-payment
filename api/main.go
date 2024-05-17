@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/infra"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/use_case"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/external/database/mongodb"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/external/database/dynamodb"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/external/handler/http_server"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/external/repository"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/external/service"
@@ -27,7 +27,7 @@ func main() {
 		panic(err)
 	}
 
-	db, err := mongodb.NewConnection(cfg)
+	db, err := dynamodb.NewConnection(cfg)
 
 	if err != nil {
 		logger.Error("error connecting tdo database", err)

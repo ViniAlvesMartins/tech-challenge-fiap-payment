@@ -28,37 +28,38 @@ func (p *PaymentUseCase) Create(payment *entity.Payment) error {
 	return nil
 }
 
-func (p *PaymentUseCase) GetLastPaymentStatus(orderId int) (enum.PaymentStatus, error) {
+func (p *PaymentUseCase) GetLastPaymentStatus(paymentId int) (enum.PaymentStatus, error) {
 
-	payment, err := p.repository.GetLastPaymentStatus(orderId)
+	payment, err := p.repository.GetLastPaymentStatus(paymentId)
 
 	if err != nil && payment != nil {
-		return payment.Status, err
+		return payment.CurrentState, err
 	}
 
-	if payment != nil && payment.Status == "" {
+	if payment != nil && payment.CurrentState == "" {
 		return enum.PENDING, nil
 	}
 
-	return payment.Status, nil
+	return payment.CurrentState, nil
 }
 
 func (p *PaymentUseCase) CreateQRCode(order *entity.Order) (*response_payment_service.CreateQRCode, error) {
-	//lastPaymentStatus, err := p.GetLastPaymentStatus(order.ID)
-	//
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//if lastPaymentStatus == enum.CONFIRMED {
-	//	p.logger.Error("Last payment status: %v", lastPaymentStatus)
-	//	return nil, nil
-	//}
+	lastPaymentStatus, err := p.GetLastPaymentStatus(order.ID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if lastPaymentStatus == enum.CONFIRMED {
+		p.logger.Error("Last payment status: %v", lastPaymentStatus)
+		return nil, nil
+	}
 
 	payment := &entity.Payment{
-		Type:   enum.QRCODE,
-		Status: enum.PENDING,
-		Amount: order.Amount,
+		OrderID:      order.ID,
+		Type:         enum.QRCODE,
+		CurrentState: enum.PENDING,
+		Amount:       order.Amount,
 	}
 
 	p.Create(payment)
@@ -68,14 +69,9 @@ func (p *PaymentUseCase) CreateQRCode(order *entity.Order) (*response_payment_se
 	return &qrCode, nil
 }
 
-func (p *PaymentUseCase) PaymentNotification(order *entity.Order) error {
-	payment := &entity.Payment{
-		Type:   enum.QRCODE,
-		Status: enum.CONFIRMED,
-		Amount: order.Amount,
-	}
+func (p *PaymentUseCase) PaymentNotification(paymentId int) error {
 
-	p.Create(payment)
+	p.repository.UpdateStatus(paymentId, enum.CONFIRMED)
 
 	// ENVIAR MSG PARA FILA
 

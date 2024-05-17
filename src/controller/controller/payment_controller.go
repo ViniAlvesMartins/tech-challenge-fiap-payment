@@ -75,7 +75,7 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 	}
 
 	order := entity.Order{
-		ID:          1,
+		ID:          19,
 		Amount:      1,
 		StatusOrder: enum.RECEIVED,
 	}
@@ -123,8 +123,9 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 // @Failure      500  {object}  swagger.InternalServerErrorResponse{data=interface{}}
 // @Router       /orders/{id}/status-payment [get]
 func (p *PaymentController) GetLastPaymentStatus(w http.ResponseWriter, r *http.Request) {
-	orderIdParam := mux.Vars(r)["orderId"]
-	orderId, err := strconv.Atoi(orderIdParam)
+	paymentIdParam := mux.Vars(r)["paymentId"]
+	paymentId, err := strconv.Atoi(paymentIdParam)
+
 	if err != nil {
 		p.logger.Error("error to convert id order to int", slog.Any("error", err.Error()))
 
@@ -137,7 +138,7 @@ func (p *PaymentController) GetLastPaymentStatus(w http.ResponseWriter, r *http.
 		return
 	}
 
-	paymentStatus, err := p.paymentUseCase.GetLastPaymentStatus(orderId)
+	paymentStatus, err := p.paymentUseCase.GetLastPaymentStatus(paymentId)
 	if err != nil {
 		p.logger.Error("error getting last payment status", slog.Any("error", err.Error()))
 
@@ -156,7 +157,7 @@ func (p *PaymentController) GetLastPaymentStatus(w http.ResponseWriter, r *http.
 		Response{
 			Error: "",
 			Data: GetLastPaymentStatus{
-				OrderId:       orderId,
+				OrderId:       paymentId,
 				PaymentStatus: paymentStatus,
 			},
 		})
@@ -175,9 +176,9 @@ func (p *PaymentController) GetLastPaymentStatus(w http.ResponseWriter, r *http.
 // @Failure      500  {object}  swagger.InternalServerErrorResponse{data=interface{}}
 // @Router       /orders/{id}/notification-payments [post]
 func (p *PaymentController) Notification(w http.ResponseWriter, r *http.Request) {
-	orderIdParam := mux.Vars(r)["orderId"]
+	paymentIdParam := mux.Vars(r)["paymentId"]
 
-	orderId, err := strconv.Atoi(orderIdParam)
+	paymentId, err := strconv.Atoi(paymentIdParam)
 	if err != nil {
 		p.logger.Error("error to convert id order to int", slog.Any("error", err.Error()))
 
@@ -187,33 +188,11 @@ func (p *PaymentController) Notification(w http.ResponseWriter, r *http.Request)
 				Error: "Order id must be an integer",
 				Data:  nil,
 			})
+
 		return
 	}
 
-	order, err := p.orderUseCase.GetById(orderId)
-	if err != nil {
-		p.logger.Error("error getting order by id", slog.Any("error", err.Error()))
-
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(
-			Response{
-				Error: "Error getting order by id",
-				Data:  nil,
-			})
-		return
-	}
-
-	if order == nil {
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(
-			Response{
-				Error: "Order not found",
-				Data:  nil,
-			})
-		return
-	}
-
-	if err = p.paymentUseCase.PaymentNotification(order); err != nil {
+	if err = p.paymentUseCase.PaymentNotification(paymentId); err != nil {
 		p.logger.Error("error processing payment notification", slog.Any("error", err.Error()))
 
 		w.WriteHeader(http.StatusInternalServerError)
