@@ -104,30 +104,30 @@ func (mr *MockPaymentUseCaseMockRecorder) CreateQRCode(order interface{}) *gomoc
 }
 
 // GetLastPaymentStatus mocks base method.
-func (m *MockPaymentUseCase) GetLastPaymentStatus(orderId int) (enum.PaymentStatus, error) {
+func (m *MockPaymentUseCase) GetLastPaymentStatus(paymentId int) (enum.PaymentStatus, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetLastPaymentStatus", orderId)
+	ret := m.ctrl.Call(m, "GetLastPaymentStatus", paymentId)
 	ret0, _ := ret[0].(enum.PaymentStatus)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetLastPaymentStatus indicates an expected call of GetLastPaymentStatus.
-func (mr *MockPaymentUseCaseMockRecorder) GetLastPaymentStatus(orderId interface{}) *gomock.Call {
+func (mr *MockPaymentUseCaseMockRecorder) GetLastPaymentStatus(paymentId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLastPaymentStatus", reflect.TypeOf((*MockPaymentUseCase)(nil).GetLastPaymentStatus), orderId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLastPaymentStatus", reflect.TypeOf((*MockPaymentUseCase)(nil).GetLastPaymentStatus), paymentId)
 }
 
 // PaymentNotification mocks base method.
-func (m *MockPaymentUseCase) PaymentNotification(order *entity.Order) error {
+func (m *MockPaymentUseCase) PaymentNotification(paymentId int) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PaymentNotification", order)
+	ret := m.ctrl.Call(m, "PaymentNotification", paymentId)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // PaymentNotification indicates an expected call of PaymentNotification.
-func (mr *MockPaymentUseCaseMockRecorder) PaymentNotification(order interface{}) *gomock.Call {
+func (mr *MockPaymentUseCaseMockRecorder) PaymentNotification(paymentId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PaymentNotification", reflect.TypeOf((*MockPaymentUseCase)(nil).PaymentNotification), order)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PaymentNotification", reflect.TypeOf((*MockPaymentUseCase)(nil).PaymentNotification), paymentId)
 }

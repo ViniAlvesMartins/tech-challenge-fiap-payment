@@ -8,6 +8,7 @@ import (
 	reflect "reflect"
 
 	entity "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
+	enum "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -62,4 +63,19 @@ func (m *MockPaymentRepository) GetLastPaymentStatus(orderId int) (*entity.Payme
 func (mr *MockPaymentRepositoryMockRecorder) GetLastPaymentStatus(orderId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLastPaymentStatus", reflect.TypeOf((*MockPaymentRepository)(nil).GetLastPaymentStatus), orderId)
+}
+
+// UpdateStatus mocks base method.
+func (m *MockPaymentRepository) UpdateStatus(orderId int, status enum.PaymentStatus) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateStatus", orderId, status)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateStatus indicates an expected call of UpdateStatus.
+func (mr *MockPaymentRepositoryMockRecorder) UpdateStatus(orderId, status interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateStatus", reflect.TypeOf((*MockPaymentRepository)(nil).UpdateStatus), orderId, status)
 }

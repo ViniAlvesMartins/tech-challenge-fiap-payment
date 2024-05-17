@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
 	"strconv"
 

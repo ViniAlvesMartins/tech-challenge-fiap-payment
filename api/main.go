@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/infra"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/use_case"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/database/mongodb"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/database/dynamodb"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/handler/http_server"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/repository"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/service"

@@ -8,8 +8,8 @@ services:
       - "8000:8000"
     networks:
       - dev-networks
-  dev-app:
-    container_name: app.ze-burger.dev
+  payment-dev-app:
+    container_name: app.ze-burger-payments.dev
     env_file: .env
     build:
       dockerfile: ./infra/local/Dockerfile
