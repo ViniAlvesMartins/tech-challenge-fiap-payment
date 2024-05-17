@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
 	"strconv"
 
@@ -50,15 +49,32 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 	var paymentDTO dto.PaymentDto
 	var response Response
 
+	orderIdParam := mux.Vars(r)["orderId"]
+	orderId, err := strconv.Atoi(orderIdParam)
+
+	if err != nil {
+		p.logger.Error("error to convert id order to int", slog.Any("error", err.Error()))
+
+		w.WriteHeader(http.StatusInternalServerError)
+		jsonResponse, _ := json.Marshal(
+			Response{
+				Error: "Order id must be an integer",
+				Data:  nil,
+			})
+		w.Write(jsonResponse)
+		return
+	}
+
 	if err := json.NewDecoder(r.Body).Decode(&paymentDTO); err != nil {
 		p.logger.Error("Unable to decode the request body.  %v", slog.Any("error", err))
 
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(
+		jsonResponse, _ := json.Marshal(
 			Response{
 				Error: "Error decoding request body",
 				Data:  nil,
 			})
+		w.Write(jsonResponse)
 		return
 	}
 
@@ -75,13 +91,32 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	order := entity.Order{
-		ID:          19,
-		Amount:      1,
-		StatusOrder: enum.RECEIVED,
+	order, err := p.orderUseCase.GetById(orderId)
+	if err != nil {
+		p.logger.Error("error getting order", slog.Any("error", err.Error()))
+
+		w.WriteHeader(http.StatusBadRequest)
+		jsonResponse, _ := json.Marshal(
+			Response{
+				Error: "Error getting order details",
+				Data:  nil,
+			})
+		w.Write(jsonResponse)
+		return
 	}
 
-	qrCode, err := p.paymentUseCase.CreateQRCode(&order)
+	if order == nil {
+		w.WriteHeader(http.StatusNotFound)
+		jsonResponse, _ := json.Marshal(
+			Response{
+				Error: "Order not found",
+				Data:  nil,
+			})
+		w.Write(jsonResponse)
+		return
+	}
+
+	qrCode, err := p.paymentUseCase.CreateQRCode(order)
 
 	if err != nil {
 		p.logger.Error("error creating qr code", slog.Any("error", err.Error()))
@@ -93,7 +128,6 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 				Data:  nil,
 			})
 		w.Write(jsonResponse)
-
 		return
 	}
 

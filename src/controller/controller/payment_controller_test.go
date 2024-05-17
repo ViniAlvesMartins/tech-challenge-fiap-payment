@@ -292,10 +292,10 @@ func TestPaymentController_GetLastPaymentStatus(t *testing.T) {
 		paymentUseCaseMock.EXPECT().GetLastPaymentStatus(1).Return(enum.PENDING, nil)
 
 		vars := map[string]string{
-			"orderId": "1",
+			"paymentId": "1",
 		}
 
-		r, _ := http.NewRequest("GET", "/status-payment", nil)
+		r, _ := http.NewRequest("GET", "/payment/{paymentId}/status", nil)
 		w := httptest.NewRecorder()
 		r = mux.SetURLVars(r, vars)
 
@@ -322,7 +322,7 @@ func TestPaymentController_GetLastPaymentStatus(t *testing.T) {
 		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
 
 		vars := map[string]string{
-			"orderId": "not a number",
+			"paymentId": "not a number",
 		}
 
 		r, _ := http.NewRequest("GET", "/status-payment", nil)
@@ -351,10 +351,10 @@ func TestPaymentController_GetLastPaymentStatus(t *testing.T) {
 		paymentUseCaseMock.EXPECT().GetLastPaymentStatus(1).Return(enum.PENDING, errors.New("error getting last payment status"))
 
 		vars := map[string]string{
-			"orderId": "1",
+			"paymentId": "1",
 		}
 
-		r, _ := http.NewRequest("GET", "/status-payment", nil)
+		r, _ := http.NewRequest("GET", "/payments/{paymentId}/status", nil)
 		w := httptest.NewRecorder()
 		r = mux.SetURLVars(r, vars)
 
@@ -375,26 +375,17 @@ func TestPaymentController_Notification(t *testing.T) {
 	t.Run("get last payment status successfully", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 
-		order := &entity.Order{
-			ID:          1,
-			ClientId:    nil,
-			StatusOrder: enum.AWAITING_PAYMENT,
-			Amount:      123.45,
-			CreatedAt:   time.Now(),
-		}
-
 		loggerMock := slog.New(slog.NewTextHandler(os.Stderr, nil))
 		orderUseCaseMock := mock.NewMockOrderUseCase(ctrl)
-		orderUseCaseMock.EXPECT().GetById(1).Return(order, nil).Times(1)
 
 		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
-		paymentUseCaseMock.EXPECT().PaymentNotification(order).Return(nil)
+		paymentUseCaseMock.EXPECT().PaymentNotification(1).Return(nil)
 
 		vars := map[string]string{
-			"orderId": "1",
+			"paymentId": "1",
 		}
 
-		r, _ := http.NewRequest("POST", "/notification-payments", nil)
+		r, _ := http.NewRequest("POST", "/payments/{paymentId}/notification-payments", nil)
 		w := httptest.NewRecorder()
 		r = mux.SetURLVars(r, vars)
 

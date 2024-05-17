@@ -19,14 +19,14 @@ func TestPaymentUseCase_Create(t *testing.T) {
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 
 		payment := entity.Payment{
-			OrderID: 1,
-			Type:    enum.QRCODE,
-			Status:  enum.PENDING,
-			Amount:  123.45,
+			OrderID:      1,
+			Type:         enum.QRCODE,
+			CurrentState: enum.PENDING,
+			Amount:       123.45,
 		}
 
 		result := payment
-		result.ID = "65cf595b-19b9-431b-9a81-9818dec845ff"
+		result.PaymentID = "65cf595b-19b9-431b-9a81-9818dec845ff"
 
 		externalPaymentMock := mock.NewMockExternalPaymentService(ctrl)
 
@@ -45,10 +45,10 @@ func TestPaymentUseCase_Create(t *testing.T) {
 		expectedErr := errors.New("error connecting to database")
 
 		payment := entity.Payment{
-			OrderID: 1,
-			Type:    enum.QRCODE,
-			Status:  enum.PENDING,
-			Amount:  123.45,
+			OrderID:      1,
+			Type:         enum.QRCODE,
+			CurrentState: enum.PENDING,
+			Amount:       123.45,
 		}
 
 		externalPaymentMock := mock.NewMockExternalPaymentService(ctrl)
@@ -88,11 +88,11 @@ func TestPaymentUseCase_GetLastPaymentStatus(t *testing.T) {
 		expectedErr := errors.New("error connecting to database")
 
 		payment := &entity.Payment{
-			ID:      "65cf595b-19b9-431b-9a81-9818dec845f0",
-			OrderID: 1,
-			Type:    enum.QRCODE,
-			Status:  enum.PENDING,
-			Amount:  132.45,
+			PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
+			OrderID:      1,
+			Type:         enum.QRCODE,
+			CurrentState: enum.PENDING,
+			Amount:       132.45,
 		}
 
 		externalPaymentMock := mock.NewMockExternalPaymentService(ctrl)
@@ -103,7 +103,7 @@ func TestPaymentUseCase_GetLastPaymentStatus(t *testing.T) {
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, logger)
 		status, err := paymentUseCase.GetLastPaymentStatus(1)
 
-		assert.Equal(t, payment.Status, status)
+		assert.Equal(t, payment.CurrentState, status)
 		assert.Error(t, expectedErr, err)
 	})
 }
@@ -118,22 +118,22 @@ func lastPaymentStatusPayments() []paymentTest {
 	return []paymentTest{
 		{
 			Payment: &entity.Payment{
-				ID:      "65cf595b-19b9-431b-9a81-9818dec845f0",
-				OrderID: 1,
-				Type:    enum.QRCODE,
-				Status:  enum.PENDING,
-				Amount:  132.45,
+				PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
+				OrderID:      1,
+				Type:         enum.QRCODE,
+				CurrentState: enum.PENDING,
+				Amount:       132.45,
 			},
 			Expected: enum.PENDING,
 			Type:     fmt.Sprintf("[%s status]", string(enum.PENDING)),
 		},
 		{
 			Payment: &entity.Payment{
-				ID:      "65cf595b-19b9-431b-9a81-9818dec845f1",
-				OrderID: 1,
-				Type:    enum.QRCODE,
-				Status:  "",
-				Amount:  132.45,
+				PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f1",
+				OrderID:      1,
+				Type:         enum.QRCODE,
+				CurrentState: "",
+				Amount:       132.45,
 			},
 			Expected: enum.PENDING,
 			Type:     "[empty status]",

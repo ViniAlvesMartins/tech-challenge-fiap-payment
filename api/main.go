@@ -13,7 +13,7 @@ import (
 	"os"
 )
 
-// @title           Ze Burguer APIs
+// @title           Ze Burguer Payment APIs
 // @version         1.0
 func main() {
 	var err error
@@ -30,7 +30,7 @@ func main() {
 	db, err := dynamodb.NewConnection(cfg)
 
 	if err != nil {
-		logger.Error("error connecting tdo database", err)
+		logger.Error("error connecting to database", err)
 		panic(err)
 	}
 

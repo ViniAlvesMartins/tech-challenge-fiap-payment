@@ -29,7 +29,7 @@ func TestOrderUseCase_GetById(t *testing.T) {
 
 		orderServiceResponse := &responseorderservice.GetByIdResp{
 			Error: "",
-			Data:  []*entity.Order{order},
+			Data:  order,
 		}
 
 		orderService := mock.NewMockOrderService(ctrl)

@@ -10,11 +10,11 @@ import (
 func TestPayment_GetJSONValue(t *testing.T) {
 	t.Run("get json value successfully", func(t *testing.T) {
 		p := Payment{
-			ID:      "1",
-			OrderID: 1,
-			Type:    enum.QRCODE,
-			Status:  enum.PENDING,
-			Amount:  123.45,
+			PaymentID:    "1",
+			OrderID:      1,
+			Type:         enum.QRCODE,
+			CurrentState: enum.PENDING,
+			Amount:       123.45,
 		}
 
 		expectedJSON, _ := json.Marshal(p)

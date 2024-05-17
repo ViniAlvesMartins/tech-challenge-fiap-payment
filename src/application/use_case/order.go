@@ -29,17 +29,15 @@ func (o *OrderUseCase) GetById(id int) (*entity.Order, error) {
 		return nil, errors.New(orderServiceResponse.Error)
 	}
 
-	if len(orderServiceResponse.Data) == 0 {
+	if orderServiceResponse.Data == nil {
 		return nil, nil
 	}
 
-	r := orderServiceResponse.Data[0]
-
 	return &entity.Order{
-		ID:          r.ID,
-		ClientId:    r.ClientId,
-		StatusOrder: r.StatusOrder,
-		Amount:      r.Amount,
-		CreatedAt:   r.CreatedAt,
+		ID:          orderServiceResponse.Data.ID,
+		ClientId:    orderServiceResponse.Data.ClientId,
+		StatusOrder: orderServiceResponse.Data.StatusOrder,
+		Amount:      orderServiceResponse.Data.Amount,
+		CreatedAt:   orderServiceResponse.Data.CreatedAt,
 	}, nil
 }
