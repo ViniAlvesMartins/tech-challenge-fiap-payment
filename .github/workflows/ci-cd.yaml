@@ -41,7 +41,7 @@ jobs:
           context: .
           file: ./infra/prod/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ze_burguer:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ze_burguer_payment:latest
 
   deploy:
     name: Deploy
