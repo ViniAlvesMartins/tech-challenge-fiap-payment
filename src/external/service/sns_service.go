@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/enum"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
