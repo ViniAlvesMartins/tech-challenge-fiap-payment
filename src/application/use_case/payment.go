@@ -1,6 +1,7 @@
 package use_case
 
 import (
+	"fmt"
 	"log/slog"
 
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/contract"
@@ -73,9 +74,19 @@ func (p *PaymentUseCase) CreateQRCode(order *entity.Order) (*response_payment_se
 
 func (p *PaymentUseCase) PaymentNotification(paymentId int) error {
 
-	p.repository.UpdateStatus(paymentId, enum.CONFIRMED)
+	_, err := p.repository.UpdateStatus(paymentId, enum.CONFIRMED)
 
-	// ENVIAR MSG PARA FILA
+	if err != nil {
+		panic(err)
+	}
+
+	res, err := p.snsService.SendMessage(paymentId, enum.CONFIRMED)
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(res)
 
 	return nil
 }
