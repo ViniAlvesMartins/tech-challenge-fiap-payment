@@ -10,6 +10,7 @@ import (
 	response_order_service "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/order_service"
 	response_payment_service "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/payment_service"
 	entity "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
+	enum "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -87,4 +88,42 @@ func (m *MockOrderService) GetById(id int) (*response_order_service.GetByIdResp,
 func (mr *MockOrderServiceMockRecorder) GetById(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetById", reflect.TypeOf((*MockOrderService)(nil).GetById), id)
+}
+
+// MockSnsService is a mock of SnsService interface.
+type MockSnsService struct {
+	ctrl     *gomock.Controller
+	recorder *MockSnsServiceMockRecorder
+}
+
+// MockSnsServiceMockRecorder is the mock recorder for MockSnsService.
+type MockSnsServiceMockRecorder struct {
+	mock *MockSnsService
+}
+
+// NewMockSnsService creates a new mock instance.
+func NewMockSnsService(ctrl *gomock.Controller) *MockSnsService {
+	mock := &MockSnsService{ctrl: ctrl}
+	mock.recorder = &MockSnsServiceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockSnsService) EXPECT() *MockSnsServiceMockRecorder {
+	return m.recorder
+}
+
+// SendMessage mocks base method.
+func (m *MockSnsService) SendMessage(paymentId int, status enum.PaymentStatus) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SendMessage", paymentId, status)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SendMessage indicates an expected call of SendMessage.
+func (mr *MockSnsServiceMockRecorder) SendMessage(paymentId, status interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMessage", reflect.TypeOf((*MockSnsService)(nil).SendMessage), paymentId, status)
 }

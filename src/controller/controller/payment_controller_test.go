@@ -42,52 +42,17 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
 		paymentUseCaseMock.EXPECT().CreateQRCode(order).Return(qrCode, nil)
 
-		body := input.PaymentDto{Type: string(enum.QRCODE)}
+		body := input.PaymentDto{OrderId: order.ID, Type: string(enum.QRCODE)}
 		jsonBody, _ := json.Marshal(body)
 		bodyReader := bytes.NewReader(jsonBody)
 
-		vars := map[string]string{
-			"orderId": "1",
-		}
-
 		r, _ := http.NewRequest("POST", "/payments", bodyReader)
 		w := httptest.NewRecorder()
-		r = mux.SetURLVars(r, vars)
 
 		c := NewPaymentController(paymentUseCaseMock, loggerMock, orderUseCaseMock)
 		c.CreatePayment(w, r)
 
 		assert.Equal(t, http.StatusCreated, w.Code)
-	})
-
-	t.Run("error converting order id", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-
-		loggerMock := slog.New(slog.NewTextHandler(os.Stderr, nil))
-		orderUseCaseMock := mock.NewMockOrderUseCase(ctrl)
-		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
-
-		jsonBody, _ := json.Marshal(input.PaymentDto{})
-		bodyReader := bytes.NewReader(jsonBody)
-
-		vars := map[string]string{
-			"orderId": "not a number",
-		}
-
-		r, _ := http.NewRequest("POST", "/payments", bodyReader)
-		w := httptest.NewRecorder()
-		r = mux.SetURLVars(r, vars)
-
-		c := NewPaymentController(paymentUseCaseMock, loggerMock, orderUseCaseMock)
-		c.CreatePayment(w, r)
-
-		jsonResponse, _ := json.Marshal(Response{
-			Error: "Order id must be an integer",
-			Data:  nil,
-		})
-
-		assert.Equal(t, http.StatusInternalServerError, w.Code)
-		assert.Equal(t, string(jsonResponse), string(w.Body.Bytes()))
 	})
 
 	t.Run("invalid body", func(t *testing.T) {
@@ -106,13 +71,8 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 		jsonBody, _ := json.Marshal(wrongDTO)
 		bodyReader := bytes.NewReader(jsonBody)
 
-		vars := map[string]string{
-			"orderId": "1",
-		}
-
 		r, _ := http.NewRequest("POST", "/payments", bodyReader)
 		w := httptest.NewRecorder()
-		r = mux.SetURLVars(r, vars)
 
 		c := NewPaymentController(paymentUseCaseMock, loggerMock, orderUseCaseMock)
 		c.CreatePayment(w, r)
@@ -136,17 +96,12 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 		orderUseCaseMock := mock.NewMockOrderUseCase(ctrl)
 		orderUseCaseMock.EXPECT().GetById(1).Return(nil, expectedErr).Times(1)
 
-		body := input.PaymentDto{Type: string(enum.QRCODE)}
+		body := input.PaymentDto{OrderId: 1, Type: string(enum.QRCODE)}
 		jsonBody, _ := json.Marshal(body)
 		bodyReader := bytes.NewReader(jsonBody)
 
-		vars := map[string]string{
-			"orderId": "1",
-		}
-
 		r, _ := http.NewRequest("POST", "/payments", bodyReader)
 		w := httptest.NewRecorder()
-		r = mux.SetURLVars(r, vars)
 
 		c := NewPaymentController(paymentUseCaseMock, loggerMock, orderUseCaseMock)
 		c.CreatePayment(w, r)
@@ -170,17 +125,12 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 
 		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
 
-		body := input.PaymentDto{Type: string(enum.QRCODE)}
+		body := input.PaymentDto{OrderId: 1, Type: string(enum.QRCODE)}
 		jsonBody, _ := json.Marshal(body)
 		bodyReader := bytes.NewReader(jsonBody)
 
-		vars := map[string]string{
-			"orderId": "1",
-		}
-
 		r, _ := http.NewRequest("POST", "/payments", bodyReader)
 		w := httptest.NewRecorder()
-		r = mux.SetURLVars(r, vars)
 
 		c := NewPaymentController(paymentUseCaseMock, loggerMock, orderUseCaseMock)
 		c.CreatePayment(w, r)
@@ -213,17 +163,12 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
 		paymentUseCaseMock.EXPECT().CreateQRCode(order).Return(nil, errors.New("error creating qr code"))
 
-		body := input.PaymentDto{Type: string(enum.QRCODE)}
+		body := input.PaymentDto{OrderId: order.ID, Type: string(enum.QRCODE)}
 		jsonBody, _ := json.Marshal(body)
 		bodyReader := bytes.NewReader(jsonBody)
 
-		vars := map[string]string{
-			"orderId": "1",
-		}
-
 		r, _ := http.NewRequest("POST", "/payments", bodyReader)
 		w := httptest.NewRecorder()
-		r = mux.SetURLVars(r, vars)
 
 		c := NewPaymentController(paymentUseCaseMock, loggerMock, orderUseCaseMock)
 		c.CreatePayment(w, r)
@@ -256,17 +201,12 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
 		paymentUseCaseMock.EXPECT().CreateQRCode(order).Return(nil, nil)
 
-		body := input.PaymentDto{Type: string(enum.QRCODE)}
+		body := input.PaymentDto{OrderId: order.ID, Type: string(enum.QRCODE)}
 		jsonBody, _ := json.Marshal(body)
 		bodyReader := bytes.NewReader(jsonBody)
 
-		vars := map[string]string{
-			"orderId": "1",
-		}
-
 		r, _ := http.NewRequest("POST", "/payments", bodyReader)
 		w := httptest.NewRecorder()
-		r = mux.SetURLVars(r, vars)
 
 		c := NewPaymentController(paymentUseCaseMock, loggerMock, orderUseCaseMock)
 		c.CreatePayment(w, r)
