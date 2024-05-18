@@ -9,7 +9,6 @@ import (
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/sns"
 )
 
@@ -21,12 +20,6 @@ func NewConnection() (*sns.Client, error) {
 
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
 		config.WithRegion("us-east-1"),
-
-		config.WithCredentialsProvider(credentials.StaticCredentialsProvider{
-			Value: aws.Credentials{
-				AccessKeyID: "", SecretAccessKey: "",
-			},
-		}),
 	)
 
 	if err != nil {
@@ -43,26 +36,17 @@ func (s *SnsService) SendMessage(paymentId int, status enum.PaymentStatus) (bool
 	client, _ := NewConnection()
 
 	message := &Message{
-		PaymentId: paymentId,
-		Status:    status,
+		OrderId: paymentId,
+		Status:  status,
 	}
-
-	fmt.Println("teste1234")
-	fmt.Println(message)
 
 	messageJs, _ := json.Marshal(message)
 
-	fmt.Println("teste12")
-	fmt.Println(messageJs)
-
 	snsMessage := string(messageJs)
-
-	fmt.Println("teste")
-	fmt.Println(snsMessage)
 
 	input := &sns.PublishInput{
 		Message:  aws.String(snsMessage),
-		TopicArn: aws.String("arn:aws:sns:us-east-1:408004708958:payments-sns"),
+		TopicArn: aws.String("arn:aws:sns:us-east-1:682279319757:update_order_status-topic"),
 	}
 
 	result, err := client.Publish(context.TODO(), input)
@@ -76,6 +60,6 @@ func (s *SnsService) SendMessage(paymentId int, status enum.PaymentStatus) (bool
 }
 
 type Message struct {
-	PaymentId int
-	Status    enum.PaymentStatus
+	OrderId int
+	Status  enum.PaymentStatus
 }
