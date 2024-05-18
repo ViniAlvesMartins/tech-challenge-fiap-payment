@@ -13,3 +13,7 @@ type ExternalPaymentService interface {
 type OrderService interface {
 	GetById(orderId int) (*response_order_service.GetByIdResp, error)
 }
+
+type SnsService interface {
+	sendMessage(payment entity.Payment) (bool, error)
+}

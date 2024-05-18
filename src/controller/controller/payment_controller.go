@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/enum"
 	"strconv"
 
@@ -74,13 +73,31 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	order := entity.Order{
-		ID:          19,
-		Amount:      1,
-		StatusOrder: enum.RECEIVED,
+	order, err := p.orderUseCase.GetById(paymentDTO.OrderId)
+
+	if err != nil {
+		p.logger.Error("error getting order", slog.Any("error", err.Error()))
+
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(
+			Response{
+				Error: "Error getting order details",
+				Data:  nil,
+			})
+		return
 	}
 
-	qrCode, err := p.paymentUseCase.CreateQRCode(&order)
+	if order == nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(
+			Response{
+				Error: "Order not found",
+				Data:  nil,
+			})
+		return
+	}
+
+	qrCode, err := p.paymentUseCase.CreateQRCode(order)
 
 	if err != nil {
 		p.logger.Error("error creating qr code", slog.Any("error", err.Error()))
