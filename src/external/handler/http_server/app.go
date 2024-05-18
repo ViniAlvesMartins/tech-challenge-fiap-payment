@@ -34,7 +34,7 @@ func (e *App) Run(ctx context.Context) error {
 	router := mux.NewRouter()
 
 	paymentController := controller.NewPaymentController(e.paymentUseCase, e.logger, e.orderUseCase)
-	router.HandleFunc("/payments/{orderId:[0-9]+}", paymentController.CreatePayment).Methods("POST")
+	router.HandleFunc("/payments", paymentController.CreatePayment).Methods("POST")
 	router.HandleFunc("/payments/{paymentId:[0-9]+}/status", paymentController.GetLastPaymentStatus).Methods("GET")
 	router.HandleFunc("/payments/{paymentId:[0-9]+}/notification-payments", paymentController.Notification).Methods("POST")
 
