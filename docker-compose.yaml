@@ -8,7 +8,7 @@ services:
       - "8000:8000"
     networks:
       - dev-networks
-  payment-dev-app:
+  dev-app-payment:
     container_name: app.ze-burger-payments.dev
     env_file: .env
     build:
@@ -17,12 +17,11 @@ services:
     volumes:
       - .:/app
     ports:
-      - 8081:8080
+      - 8081:8081
     networks:
       - dev-networks
 
-
 networks:
   dev-networks:
-    driver: bridge
-  
+    external:
+      name: minha_rede

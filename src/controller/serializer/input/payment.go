@@ -6,11 +6,13 @@ import (
 )
 
 type PaymentDto struct {
-	Type string `json:"type" validate:"required" error:"Tipo de pagamento é obrigatorio"`
+	Type    string `json:"type" validate:"required" error:"Tipo de pagamento é obrigatorio"`
+	OrderId int    `json:"orderId" validate:"required" error:"order id é obrigatorio"`
 }
 
 func (p *PaymentDto) ConvertToEntity() entity.Payment {
 	return entity.Payment{
-		Type: enum.PaymentType(p.Type),
+		OrderID: p.OrderId,
+		Type:    enum.PaymentType(p.Type),
 	}
 }

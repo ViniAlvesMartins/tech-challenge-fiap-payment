@@ -2,14 +2,14 @@ package controller
 
 import (
 	"encoding/json"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/enum"
 	"strconv"
 
 	"github.com/gorilla/mux"
 
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/contract"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/controller/serializer"
-	dto "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/controller/serializer/input"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/contract"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/controller/serializer"
+	dto "github.com/ViniAlvesMartins/tech-challenge-fiap/src/controller/serializer/input"
 	"log/slog"
 	"net/http"
 )
@@ -49,32 +49,15 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 	var paymentDTO dto.PaymentDto
 	var response Response
 
-	orderIdParam := mux.Vars(r)["orderId"]
-	orderId, err := strconv.Atoi(orderIdParam)
-
-	if err != nil {
-		p.logger.Error("error to convert id order to int", slog.Any("error", err.Error()))
-
-		w.WriteHeader(http.StatusInternalServerError)
-		jsonResponse, _ := json.Marshal(
-			Response{
-				Error: "Order id must be an integer",
-				Data:  nil,
-			})
-		w.Write(jsonResponse)
-		return
-	}
-
 	if err := json.NewDecoder(r.Body).Decode(&paymentDTO); err != nil {
 		p.logger.Error("Unable to decode the request body.  %v", slog.Any("error", err))
 
 		w.WriteHeader(http.StatusInternalServerError)
-		jsonResponse, _ := json.Marshal(
+		json.NewEncoder(w).Encode(
 			Response{
 				Error: "Error decoding request body",
 				Data:  nil,
 			})
-		w.Write(jsonResponse)
 		return
 	}
 
@@ -82,37 +65,35 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 		p.logger.Error("validate error", slog.Any("error", serialize))
 
 		w.WriteHeader(http.StatusBadRequest)
-		jsonResponse, _ := json.Marshal(
+		json.NewEncoder(w).Encode(
 			Response{
 				Error: "Make sure all required fields are sent correctly",
 				Data:  nil,
 			})
-		w.Write(jsonResponse)
 		return
 	}
 
-	order, err := p.orderUseCase.GetById(orderId)
+	order, err := p.orderUseCase.GetById(paymentDTO.OrderId)
+
 	if err != nil {
 		p.logger.Error("error getting order", slog.Any("error", err.Error()))
 
 		w.WriteHeader(http.StatusBadRequest)
-		jsonResponse, _ := json.Marshal(
+		json.NewEncoder(w).Encode(
 			Response{
 				Error: "Error getting order details",
 				Data:  nil,
 			})
-		w.Write(jsonResponse)
 		return
 	}
 
 	if order == nil {
 		w.WriteHeader(http.StatusNotFound)
-		jsonResponse, _ := json.Marshal(
+		json.NewEncoder(w).Encode(
 			Response{
 				Error: "Order not found",
 				Data:  nil,
 			})
-		w.Write(jsonResponse)
 		return
 	}
 
@@ -122,19 +103,19 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 		p.logger.Error("error creating qr code", slog.Any("error", err.Error()))
 
 		w.WriteHeader(http.StatusInternalServerError)
-		jsonResponse, _ := json.Marshal(
+		json.NewEncoder(w).Encode(
 			Response{
 				Error: "Error creating qr code",
 				Data:  nil,
 			})
-		w.Write(jsonResponse)
+
 		return
 	}
 
 	if qrCode == nil {
 		response = Response{
 			Error: "O pagamento para o pedido já foi efetuado",
-			Data:  nil,
+			Data:  "",
 		}
 	} else {
 		response = Response{
@@ -143,13 +124,9 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 		}
 	}
 
-	jsonResponse, _ := json.Marshal(response)
-
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	w.Write(jsonResponse)
-
-	return
+	json.NewEncoder(w).Encode(response)
 }
 
 // GetLastPaymentStatus godoc
@@ -170,12 +147,11 @@ func (p *PaymentController) GetLastPaymentStatus(w http.ResponseWriter, r *http.
 		p.logger.Error("error to convert id order to int", slog.Any("error", err.Error()))
 
 		w.WriteHeader(http.StatusInternalServerError)
-		jsonResponse, _ := json.Marshal(
+		json.NewEncoder(w).Encode(
 			Response{
 				Error: "Order id must be an integer",
 				Data:  nil,
 			})
-		w.Write(jsonResponse)
 		return
 	}
 
@@ -184,18 +160,17 @@ func (p *PaymentController) GetLastPaymentStatus(w http.ResponseWriter, r *http.
 		p.logger.Error("error getting last payment status", slog.Any("error", err.Error()))
 
 		w.WriteHeader(http.StatusInternalServerError)
-		jsonResponse, _ := json.Marshal(
+		json.NewEncoder(w).Encode(
 			Response{
 				Error: "Error getting last payment status",
 				Data:  nil,
 			})
-		w.Write(jsonResponse)
 		return
 	}
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	jsonResponse, _ := json.Marshal(
+	json.NewEncoder(w).Encode(
 		Response{
 			Error: "",
 			Data: GetLastPaymentStatus{
@@ -203,8 +178,6 @@ func (p *PaymentController) GetLastPaymentStatus(w http.ResponseWriter, r *http.
 				PaymentStatus: paymentStatus,
 			},
 		})
-	w.Write(jsonResponse)
-	return
 }
 
 // Notification godoc

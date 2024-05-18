@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ze-burguer-app
+  name: ze-burguer-payment
 spec:
   selector:
     matchLabels:
-      app:  ze-burguer
+      app:  ze-burguer-payment
   template:
     metadata:
       labels:
-        app: ze-burguer
+        app: ze-burguer-payment
     spec:
       containers:
-        - name: ze-burguer
-          image: marcosilva/ze_burguer:latest
+        - name: ze-burguer-payment
+          image: marcosilva/ze_burguer_payment:latest
           ports:
             - containerPort: 8080
           envFrom:
           - configMapRef:
-              name: ze-burguer
+              name: ze-burguer-payment
           - secretRef:
-              name: ze-burguer
+              name: ze-burguer-payment
           resources:
             requests:
               cpu: "30m"
@@ -30,12 +30,12 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: ze-burguer
+  name: ze-burguer-payment
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: ze-burguer-app
+    name: ze-burguer-payment
   minReplicas: 2
   maxReplicas: 5
   metrics:
@@ -49,7 +49,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ze-burguer
+  name: ze-burguer-payment
   annotations:
     # Note that the backend talks over HTTP.
     service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
@@ -62,28 +62,23 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app: ze-burguer
+    app: ze-burguer-payment
   ports:
     - protocol: TCP
       port: 80
       targetPort: 8080
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: ze-burguer
-data:
-  DATABASE_HOST: "zeburger-db.cpwm48q0wvgx.us-east-1.rds.amazonaws.com"
-  DATABASE_PORT: "5432"
-  DATABASE_NAME: "zeburguer"
-  DATABASE_SCHEMA: "ze_burguer"
-  DATABASE_USERNAME: "zeburguer"
-  MIGRATIONS_DIR: "infra/database/migrations"
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: ze-burguer
-type: Opaque
-data:
-  DATABASE_PASSWORD: VTJUTEtSMEZtOXU3dkFUZgo=
+# ---
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: ze-burguer-payment
+# data:
+# # UPDATE LOCAL ENVS
+# ---
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: ze-burguer-payment
+# type: Opaque
+# data:
+#   DATABASE_PASSWORD: VTJUTEtSMEZtOXU3dkFUZgo=
