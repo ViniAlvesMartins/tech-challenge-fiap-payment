@@ -1,8 +1,8 @@
 package service
 
 import (
-	response_payment_service "github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/modules/response/payment_service"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/entity"
+	response_payment_service "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/payment_service"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
 )
 
 type ExternalPayment struct {

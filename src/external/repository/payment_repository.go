@@ -3,14 +3,15 @@ package repository
 import (
 	"context"
 	"fmt"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/entity"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/enum"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/google/uuid"
 	"log/slog"
+	"strconv"
 )
 
 type PaymentRepository struct {
@@ -35,12 +36,12 @@ type Item struct {
 
 func (p *PaymentRepository) Create(payment entity.Payment) (*entity.Payment, error) {
 
-	table := "Payments"
+	table := "payments"
 	id := uuid.New().String()
 
 	input := &dynamodb.PutItemInput{
 		Item: map[string]types.AttributeValue{
-			"orderId":      &types.AttributeValueMemberN{Value: fmt.Sprint(payment.OrderID)},
+			"orderId":      &types.AttributeValueMemberS{Value: strconv.Itoa(payment.OrderID)},
 			"paymentId":    &types.AttributeValueMemberS{Value: id},
 			"type":         &types.AttributeValueMemberS{Value: string(payment.Type)},
 			"currentState": &types.AttributeValueMemberS{Value: string(payment.CurrentState)},
@@ -65,12 +66,12 @@ func (p *PaymentRepository) GetLastPaymentStatus(orderId int) (*entity.Payment, 
 
 	payment := &entity.Payment{}
 
-	table := "Payments"
+	table := "payments"
 
 	out, err := p.db.GetItem(context.TODO(), &dynamodb.GetItemInput{
 		TableName: aws.String(table),
 		Key: map[string]types.AttributeValue{
-			"orderId": &types.AttributeValueMemberN{Value: fmt.Sprint(orderId)},
+			"orderId": &types.AttributeValueMemberS{Value: strconv.Itoa(payment.OrderID)},
 		},
 	})
 
@@ -88,12 +89,12 @@ func (p *PaymentRepository) GetLastPaymentStatus(orderId int) (*entity.Payment, 
 }
 
 func (p *PaymentRepository) UpdateStatus(orderId int, status enum.PaymentStatus) (bool, error) {
-	table := "Payments"
+	table := "payments"
 
 	_, err := p.db.UpdateItem(context.TODO(), &dynamodb.UpdateItemInput{
 		TableName: aws.String(table),
 		Key: map[string]types.AttributeValue{
-			"orderId": &types.AttributeValueMemberN{Value: fmt.Sprint(orderId)},
+			"orderId": &types.AttributeValueMemberS{Value: strconv.Itoa(orderId)},
 		},
 		UpdateExpression: aws.String("set currentState = :currentState"),
 		ExpressionAttributeValues: map[string]types.AttributeValue{

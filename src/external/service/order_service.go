@@ -1,39 +1,38 @@
 package service
 
 import (
-	"encoding/json"
+	"errors"
 	"fmt"
-	response_order_service "github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/modules/response/order_service"
-	"io"
-	"net/http"
-	"strconv"
+	responseorderservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/order_service"
+	"github.com/go-resty/resty/v2"
+	"log/slog"
 )
 
-type OrderService struct{}
+type OrderService struct {
+	client *resty.Client
+	logger *slog.Logger
+}
 
-func NewOrderService() *OrderService { return &OrderService{} }
+func NewOrderService(c *resty.Client, l *slog.Logger) *OrderService {
+	return &OrderService{logger: l, client: c}
+}
 
-func (o *OrderService) GetById(orderId int) (*response_order_service.GetByIdResp, error) {
+func (o *OrderService) GetById(id int) (*responseorderservice.GetByIdResp, error) {
+	var order responseorderservice.GetByIdResp
 
-	resp, err := http.Get("http://dev-app:8080/orders/" + strconv.Itoa(orderId))
+	resp, err := o.client.R().
+		SetHeader("Accept", "application/json").
+		SetResult(&order).
+		Get(fmt.Sprintf("/orders/%d", id))
 
 	if err != nil {
-		fmt.Println("Erro ao fazer a requisição:", err)
+		o.logger.Error("error making request", slog.String("error", err.Error()))
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("Erro ao ler a resposta:", err)
-		return nil, err
-	}
-
-	var order response_order_service.GetByIdResp
-
-	if err := json.Unmarshal(body, &order); err != nil {
-		return nil, fmt.Errorf("erro ao decodificar a resposta JSON: %v", err)
+	if resp.IsError() {
+		o.logger.Error("request response error", slog.Int("error_status_code", resp.StatusCode()))
+		return nil, errors.New("request response error")
 	}
 
 	return &order, nil

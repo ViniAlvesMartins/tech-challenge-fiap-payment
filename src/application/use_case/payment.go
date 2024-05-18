@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/contract"
-	response_payment_service "github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/modules/response/payment_service"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/entity"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/enum"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/contract"
+	responsepaymentservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/payment_service"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
 )
 
 type PaymentUseCase struct {
@@ -27,7 +27,10 @@ func NewPaymentUseCase(r contract.PaymentRepository, e contract.ExternalPaymentS
 }
 
 func (p *PaymentUseCase) Create(payment *entity.Payment) error {
-	p.repository.Create(*payment)
+	if _, err := p.repository.Create(*payment); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -46,7 +49,7 @@ func (p *PaymentUseCase) GetLastPaymentStatus(paymentId int) (enum.PaymentStatus
 	return payment.CurrentState, nil
 }
 
-func (p *PaymentUseCase) CreateQRCode(order *entity.Order) (*response_payment_service.CreateQRCode, error) {
+func (p *PaymentUseCase) CreateQRCode(order *entity.Order) (*responsepaymentservice.CreateQRCode, error) {
 	lastPaymentStatus, err := p.GetLastPaymentStatus(order.ID)
 
 	if err != nil {
@@ -54,7 +57,7 @@ func (p *PaymentUseCase) CreateQRCode(order *entity.Order) (*response_payment_se
 	}
 
 	if lastPaymentStatus == enum.CONFIRMED {
-		p.logger.Error("Last payment status: %v", lastPaymentStatus)
+		p.logger.Error(fmt.Sprintf("Last payment status: %s", lastPaymentStatus))
 		return nil, nil
 	}
 

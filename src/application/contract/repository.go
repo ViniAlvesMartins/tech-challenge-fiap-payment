@@ -1,8 +1,9 @@
+//go:generate mockgen -destination=mock/repository.go -source=repository.go -package=mock
 package contract
 
 import (
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/entity"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/enum"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
 )
 
 type PaymentRepository interface {

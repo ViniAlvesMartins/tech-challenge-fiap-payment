@@ -1,7 +1,7 @@
 package entity
 
 import (
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/enum"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
 	"github.com/google/uuid"
 )
 

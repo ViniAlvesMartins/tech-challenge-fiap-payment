@@ -2,10 +2,9 @@ package entity
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/enum"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
 )
 
 type PaymentInterface interface {
@@ -27,7 +26,6 @@ func (p *Payment) GetJSONValue() (string, error) {
 	b, err := json.Marshal(p)
 
 	if err != nil {
-		fmt.Println(err)
 		return "", err
 	}
 

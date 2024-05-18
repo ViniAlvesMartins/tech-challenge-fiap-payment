@@ -1,10 +1,10 @@
 package use_case
 
 import (
+	"errors"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/contract"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
 	"log/slog"
-
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/contract"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/entity"
 )
 
 type OrderUseCase struct {
@@ -20,11 +20,24 @@ func NewOrderUseCase(orderService contract.OrderService, logger *slog.Logger) *O
 }
 
 func (o *OrderUseCase) GetById(id int) (*entity.Order, error) {
-	order, err := o.orderService.GetById(id)
-
+	orderServiceResponse, err := o.orderService.GetById(id)
 	if err != nil {
 		return nil, err
 	}
 
-	return order.Data, nil
+	if orderServiceResponse.Error != "" {
+		return nil, errors.New(orderServiceResponse.Error)
+	}
+
+	if orderServiceResponse.Data == nil {
+		return nil, nil
+	}
+
+	return &entity.Order{
+		ID:          orderServiceResponse.Data.ID,
+		ClientId:    orderServiceResponse.Data.ClientId,
+		StatusOrder: orderServiceResponse.Data.StatusOrder,
+		Amount:      orderServiceResponse.Data.Amount,
+		CreatedAt:   orderServiceResponse.Data.CreatedAt,
+	}, nil
 }
