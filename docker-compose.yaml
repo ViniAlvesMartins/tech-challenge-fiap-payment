@@ -23,5 +23,3 @@ services:
 
 networks:
   dev-networks:
-    external:
-      name: minha_rede

@@ -32,8 +32,9 @@ func TestPaymentUseCase_Create(t *testing.T) {
 
 		repo := mock.NewMockPaymentRepository(ctrl)
 		repo.EXPECT().Create(payment).Times(1).Return(&result, nil)
+		sns := mock.NewMockSnsService(ctrl)
 
-		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, logger)
+		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 		err := paymentUseCase.Create(&payment)
 
 		assert.Nil(t, err)
@@ -55,8 +56,9 @@ func TestPaymentUseCase_Create(t *testing.T) {
 
 		repo := mock.NewMockPaymentRepository(ctrl)
 		repo.EXPECT().Create(payment).Times(1).Return(nil, expectedErr)
+		sns := mock.NewMockSnsService(ctrl)
 
-		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, logger)
+		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 		err := paymentUseCase.Create(&payment)
 
 		assert.Error(t, expectedErr, err)
@@ -71,10 +73,11 @@ func TestPaymentUseCase_GetLastPaymentStatus(t *testing.T) {
 
 			externalPaymentMock := mock.NewMockExternalPaymentService(ctrl)
 
+			sns := mock.NewMockSnsService(ctrl)
 			repo := mock.NewMockPaymentRepository(ctrl)
 			repo.EXPECT().GetLastPaymentStatus(1).Times(1).Return(tt.Payment, nil)
 
-			paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, logger)
+			paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 			status, err := paymentUseCase.GetLastPaymentStatus(1)
 
 			assert.Equal(t, tt.Expected, status)
@@ -97,10 +100,11 @@ func TestPaymentUseCase_GetLastPaymentStatus(t *testing.T) {
 
 		externalPaymentMock := mock.NewMockExternalPaymentService(ctrl)
 
+		sns := mock.NewMockSnsService(ctrl)
 		repo := mock.NewMockPaymentRepository(ctrl)
 		repo.EXPECT().GetLastPaymentStatus(1).Times(1).Return(payment, expectedErr)
 
-		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, logger)
+		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 		status, err := paymentUseCase.GetLastPaymentStatus(1)
 
 		assert.Equal(t, payment.CurrentState, status)
