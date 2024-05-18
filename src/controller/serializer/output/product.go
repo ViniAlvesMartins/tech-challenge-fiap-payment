@@ -1,6 +1,13 @@
 package output
 
-import "github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/entity"
+type Product struct {
+	ID          int     `json:"id" gorm:"primaryKey;autoIncrement"`
+	NameProduct string  `json:"name_product"`
+	Description string  `json:"description"`
+	Price       float32 `json:"price"`
+	CategoryId  int     `json:"category_id"`
+	Active      bool    `json:"active"`
+}
 
 type ProductDto struct {
 	ID          int     `json:"id"`
@@ -11,7 +18,7 @@ type ProductDto struct {
 	Active      bool    `json:"active"`
 }
 
-func ProductFromEntity(product entity.Product) ProductDto {
+func ProductFromEntity(product Product) ProductDto {
 	return ProductDto{
 		ID:          product.ID,
 		NameProduct: product.NameProduct,
@@ -22,7 +29,7 @@ func ProductFromEntity(product entity.Product) ProductDto {
 	}
 }
 
-func ProductListFromEntity(products []entity.Product) []ProductDto {
+func ProductListFromEntity(products []Product) []ProductDto {
 	var productsDto []ProductDto
 	for _, p := range products {
 		productsDto = append(productsDto, ProductFromEntity(p))

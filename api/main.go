@@ -2,18 +2,18 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/infra"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/use_case"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/external/database/dynamodb"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/external/handler/http_server"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/external/repository"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/external/service"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/infra"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/use_case"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/database/dynamodb"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/handler/http_server"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/repository"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/service"
+	"github.com/go-resty/resty/v2"
 	"log/slog"
 	"os"
 )
 
-// @title           Ze Burguer APIs
+// @title           Ze Burguer Payment APIs
 // @version         1.0
 func main() {
 	var err error
@@ -30,13 +30,13 @@ func main() {
 	db, err := dynamodb.NewConnection(cfg)
 
 	if err != nil {
-		logger.Error("error connecting tdo database", err)
+		logger.Error("error connecting to database", err)
 		panic(err)
 	}
 
-	fmt.Println(db)
+	ordersHTTPClient := loadOrdersHttpClient(cfg.OrdersURL)
 
-	orderService := service.NewOrderService()
+	orderService := service.NewOrderService(ordersHTTPClient, logger)
 	orderUseCase := use_case.NewOrderUseCase(orderService, logger)
 
 	paymentRepository := repository.NewPaymentRepository(db, logger)
@@ -60,4 +60,8 @@ func loadConfig() (infra.Config, error) {
 
 func loadLogger() *slog.Logger {
 	return slog.New(slog.NewTextHandler(os.Stderr, nil))
+}
+
+func loadOrdersHttpClient(ordersURL string) *resty.Client {
+	return resty.New().SetBaseURL(ordersURL)
 }
