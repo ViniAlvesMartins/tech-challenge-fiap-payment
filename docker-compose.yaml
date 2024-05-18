@@ -8,8 +8,8 @@ services:
       - "8000:8000"
     networks:
       - dev-networks
-  dev-app:
-    container_name: app.ze-burger.dev
+  dev-app-payment:
+    container_name: app.ze-burger-payments.dev
     env_file: .env
     build:
       dockerfile: ./infra/local/Dockerfile
@@ -21,8 +21,7 @@ services:
     networks:
       - dev-networks
 
-
 networks:
   dev-networks:
-    driver: bridge
-  
+    external:
+      name: minha_rede

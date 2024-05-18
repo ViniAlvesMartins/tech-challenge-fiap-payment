@@ -15,7 +15,7 @@ func NewOrderService() *OrderService { return &OrderService{} }
 
 func (o *OrderService) GetById(orderId int) (*response_order_service.GetByIdResp, error) {
 
-	resp, err := http.Get("http://localhost:8080/orders/" + strconv.Itoa(orderId))
+	resp, err := http.Get("http://ze-burguer-payment.tech-challenge.svc.cluster.local:80/orders/" + strconv.Itoa(orderId))
 
 	if err != nil {
 		fmt.Println("Erro ao fazer a requisição:", err)
@@ -32,12 +32,9 @@ func (o *OrderService) GetById(orderId int) (*response_order_service.GetByIdResp
 
 	var order response_order_service.GetByIdResp
 
-	if err := json.NewDecoder(resp.Body).Decode(&order); err != nil {
+	if err := json.Unmarshal(body, &order); err != nil {
 		return nil, fmt.Errorf("erro ao decodificar a resposta JSON: %v", err)
 	}
-
-	// Imprime a resposta
-	fmt.Println(string(body))
 
 	return &order, nil
 }
