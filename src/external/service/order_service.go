@@ -22,7 +22,7 @@ func (o *OrderService) GetById(id int) (*responseorderservice.GetByIdResp, error
 
 	resp, err := o.client.R().
 		SetHeader("Accept", "application/json").
-		SetResult(order).
+		SetResult(&order).
 		Get(fmt.Sprintf("/orders/%d", id))
 
 	if err != nil {
