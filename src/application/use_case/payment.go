@@ -13,11 +13,11 @@ import (
 type PaymentUseCase struct {
 	repository             contract.PaymentRepository
 	externalPaymentService contract.ExternalPaymentService
-	snsService             contract.SnsService
+	snsService             *contract.SnsService
 	logger                 *slog.Logger
 }
 
-func NewPaymentUseCase(r contract.PaymentRepository, e contract.ExternalPaymentService, s contract.SnsService, logger *slog.Logger) *PaymentUseCase {
+func NewPaymentUseCase(r contract.PaymentRepository, e contract.ExternalPaymentService, s *contract.SnsService, logger *slog.Logger) *PaymentUseCase {
 	return &PaymentUseCase{
 		repository:             r,
 		externalPaymentService: e,
