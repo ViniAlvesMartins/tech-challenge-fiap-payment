@@ -15,7 +15,7 @@ func NewOrderService() *OrderService { return &OrderService{} }
 
 func (o *OrderService) GetById(orderId int) (*response_order_service.GetByIdResp, error) {
 
-	resp, err := http.Get("http://ze-burguer-payment.tech-challenge.svc.cluster.local:80/orders/" + strconv.Itoa(orderId))
+	resp, err := http.Get("http://dev-app:8080/orders/" + strconv.Itoa(orderId))
 
 	if err != nil {
 		fmt.Println("Erro ao fazer a requisição:", err)

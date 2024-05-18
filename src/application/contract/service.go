@@ -4,6 +4,7 @@ import (
 	response_order_service "github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/modules/response/order_service"
 	response_payment_service "github.com/ViniAlvesMartins/tech-challenge-fiap/src/application/modules/response/payment_service"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/entity"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap/src/entities/enum"
 )
 
 type ExternalPaymentService interface {
@@ -15,5 +16,5 @@ type OrderService interface {
 }
 
 type SnsService interface {
-	sendMessage(payment entity.Payment) (bool, error)
+	SendMessage(paymentId int, status enum.PaymentStatus) (bool, error)
 }
