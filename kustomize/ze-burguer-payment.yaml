@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ze-burger-payment
+  name: ze-burguer-payment
 spec:
   selector:
     matchLabels:
-      app:  ze-burger-payment
+      app:  ze-burguer-payment
   template:
     metadata:
       labels:
-        app: ze-burger-payment
+        app: ze-burguer-payment
     spec:
       containers:
-        - name: ze-burger-payment
-          image: marcosilva/ze_burger_payment:latest
+        - name: ze-burguer-payment
+          image: marcosilva/ze_burguer_payment:latest
           ports:
             - containerPort: 8081
           envFrom:
           - configMapRef:
-              name: ze-burger-payment
+              name: ze-burguer-payment
           resources:
             requests:
               cpu: "30m"
@@ -28,12 +28,12 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: ze-burger-payment
+  name: ze-burguer-payment
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: ze-burger-payment
+    name: ze-burguer-payment
   minReplicas: 2
   maxReplicas: 5
   metrics:
@@ -47,7 +47,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ze-burger-payment
+  name: ze-burguer-payment
   annotations:
     # Note that the backend talks over HTTP.
     service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
@@ -60,7 +60,7 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app: ze-burger-payment
+    app: ze-burguer-payment
   ports:
     - protocol: TCP
       port: 80
@@ -69,6 +69,6 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ze-burger-payment
+  name: ze-burguer-payment
 data:
-  ORDERS_URL: "http://ze-burger.tech-challenge.svc.cluster.local"
+  ORDERS_URL: "http://ze-burguer.tech-challenge.svc.cluster.local"
