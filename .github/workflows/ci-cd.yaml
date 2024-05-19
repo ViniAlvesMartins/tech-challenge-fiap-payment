@@ -59,6 +59,7 @@ jobs:
 
   build:
     name: Build 
+    needs: [sonarcloud]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -83,7 +84,7 @@ jobs:
 
   deploy:
     name: Deploy
-    needs: [build, migration] 
+    needs: [build] 
     runs-on: ubuntu-latest
 
     steps:
