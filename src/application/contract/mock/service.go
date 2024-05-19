@@ -114,12 +114,11 @@ func (m *MockSnsService) EXPECT() *MockSnsServiceMockRecorder {
 }
 
 // SendMessage mocks base method.
-func (m *MockSnsService) SendMessage(paymentId int, status enum.PaymentStatus) (bool, error) {
+func (m *MockSnsService) SendMessage(paymentId int, status enum.PaymentStatus) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendMessage", paymentId, status)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // SendMessage indicates an expected call of SendMessage.

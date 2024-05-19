@@ -17,23 +17,3 @@ type ProductDto struct {
 	CategoryId  int     `json:"category_id"`
 	Active      bool    `json:"active"`
 }
-
-func ProductFromEntity(product Product) ProductDto {
-	return ProductDto{
-		ID:          product.ID,
-		NameProduct: product.NameProduct,
-		Description: product.Description,
-		Price:       product.Price,
-		CategoryId:  product.CategoryId,
-		Active:      product.Active,
-	}
-}
-
-func ProductListFromEntity(products []Product) []ProductDto {
-	var productsDto []ProductDto
-	for _, p := range products {
-		productsDto = append(productsDto, ProductFromEntity(p))
-	}
-
-	return productsDto
-}

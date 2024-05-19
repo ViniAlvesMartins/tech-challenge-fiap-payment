@@ -17,5 +17,5 @@ type OrderService interface {
 }
 
 type SnsService interface {
-	SendMessage(paymentId int, status enum.PaymentStatus) (bool, error)
+	SendMessage(paymentId int, status enum.PaymentStatus) error
 }
