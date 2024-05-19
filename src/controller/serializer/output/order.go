@@ -22,28 +22,3 @@ type OrderDto struct {
 	CreatedAt   time.Time    `json:"created_at"`
 	Products    []ProductDto `json:"products"`
 }
-
-func OrderFromEntity(order Order) OrderDto {
-	var orderDto = OrderDto{
-		ID:          order.ID,
-		ClientID:    order.ClientId,
-		StatusOrder: string(order.StatusOrder),
-		Amount:      order.Amount,
-		CreatedAt:   order.CreatedAt,
-	}
-
-	for _, p := range order.Products {
-		orderDto.Products = append(orderDto.Products, ProductFromEntity(*p))
-	}
-
-	return orderDto
-}
-
-func OrderListFromEntity(orders []Order) []OrderDto {
-	var ordersDto []OrderDto
-	for _, o := range orders {
-		ordersDto = append(ordersDto, OrderFromEntity(o))
-	}
-
-	return ordersDto
-}

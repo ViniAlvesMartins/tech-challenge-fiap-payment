@@ -14,6 +14,11 @@ import (
 
 type SnsService struct{}
 
+type Message struct {
+	OrderId int
+	Status  enum.PaymentStatus
+}
+
 func NewSnsService() *SnsService { return &SnsService{} }
 
 func NewConnection() (*sns.Client, error) {
@@ -31,8 +36,7 @@ func NewConnection() (*sns.Client, error) {
 	return client, nil
 }
 
-func (s *SnsService) SendMessage(paymentId int, status enum.PaymentStatus) (bool, error) {
-
+func (s *SnsService) SendMessage(paymentId int, status enum.PaymentStatus) error {
 	client, _ := NewConnection()
 
 	message := &Message{
@@ -56,10 +60,5 @@ func (s *SnsService) SendMessage(paymentId int, status enum.PaymentStatus) (bool
 
 	fmt.Printf("Message ID: %s\n", *result.MessageId)
 
-	return true, nil
-}
-
-type Message struct {
-	OrderId int
-	Status  enum.PaymentStatus
+	return nil
 }

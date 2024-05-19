@@ -5,6 +5,7 @@
 package mock
 
 import (
+	context "context"
 	reflect "reflect"
 
 	response_payment_service "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/payment_service"
@@ -75,59 +76,59 @@ func (m *MockPaymentUseCase) EXPECT() *MockPaymentUseCaseMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockPaymentUseCase) Create(payment *entity.Payment) error {
+func (m *MockPaymentUseCase) Create(ctx context.Context, payment *entity.Payment) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", payment)
+	ret := m.ctrl.Call(m, "Create", ctx, payment)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockPaymentUseCaseMockRecorder) Create(payment interface{}) *gomock.Call {
+func (mr *MockPaymentUseCaseMockRecorder) Create(ctx, payment interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockPaymentUseCase)(nil).Create), payment)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockPaymentUseCase)(nil).Create), ctx, payment)
 }
 
 // CreateQRCode mocks base method.
-func (m *MockPaymentUseCase) CreateQRCode(order *entity.Order) (*response_payment_service.CreateQRCode, error) {
+func (m *MockPaymentUseCase) CreateQRCode(ctx context.Context, order *entity.Order) (*response_payment_service.CreateQRCode, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateQRCode", order)
+	ret := m.ctrl.Call(m, "CreateQRCode", ctx, order)
 	ret0, _ := ret[0].(*response_payment_service.CreateQRCode)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateQRCode indicates an expected call of CreateQRCode.
-func (mr *MockPaymentUseCaseMockRecorder) CreateQRCode(order interface{}) *gomock.Call {
+func (mr *MockPaymentUseCaseMockRecorder) CreateQRCode(ctx, order interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateQRCode", reflect.TypeOf((*MockPaymentUseCase)(nil).CreateQRCode), order)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateQRCode", reflect.TypeOf((*MockPaymentUseCase)(nil).CreateQRCode), ctx, order)
 }
 
 // GetLastPaymentStatus mocks base method.
-func (m *MockPaymentUseCase) GetLastPaymentStatus(paymentId int) (enum.PaymentStatus, error) {
+func (m *MockPaymentUseCase) GetLastPaymentStatus(ctx context.Context, paymentId int) (enum.PaymentStatus, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetLastPaymentStatus", paymentId)
+	ret := m.ctrl.Call(m, "GetLastPaymentStatus", ctx, paymentId)
 	ret0, _ := ret[0].(enum.PaymentStatus)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetLastPaymentStatus indicates an expected call of GetLastPaymentStatus.
-func (mr *MockPaymentUseCaseMockRecorder) GetLastPaymentStatus(paymentId interface{}) *gomock.Call {
+func (mr *MockPaymentUseCaseMockRecorder) GetLastPaymentStatus(ctx, paymentId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLastPaymentStatus", reflect.TypeOf((*MockPaymentUseCase)(nil).GetLastPaymentStatus), paymentId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLastPaymentStatus", reflect.TypeOf((*MockPaymentUseCase)(nil).GetLastPaymentStatus), ctx, paymentId)
 }
 
 // PaymentNotification mocks base method.
-func (m *MockPaymentUseCase) PaymentNotification(paymentId int) error {
+func (m *MockPaymentUseCase) PaymentNotification(ctx context.Context, paymentId int) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PaymentNotification", paymentId)
+	ret := m.ctrl.Call(m, "PaymentNotification", ctx, paymentId)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // PaymentNotification indicates an expected call of PaymentNotification.
-func (mr *MockPaymentUseCaseMockRecorder) PaymentNotification(paymentId interface{}) *gomock.Call {
+func (mr *MockPaymentUseCaseMockRecorder) PaymentNotification(ctx, paymentId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PaymentNotification", reflect.TypeOf((*MockPaymentUseCase)(nil).PaymentNotification), paymentId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PaymentNotification", reflect.TypeOf((*MockPaymentUseCase)(nil).PaymentNotification), ctx, paymentId)
 }
