@@ -10,7 +10,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 env:
-  EKS_CLUSTER_NAME: eks-ze-burguer
+  EKS_CLUSTER_NAME: eks-ze-burger
   AWS_REGION: us-east-1
 
 jobs:
@@ -59,6 +59,7 @@ jobs:
 
   build:
     name: Build 
+    if: ${{ github.ref == 'refs/heads/main' }}
     needs: [sonarcloud]
     runs-on: ubuntu-latest
     steps:
@@ -80,7 +81,7 @@ jobs:
           context: .
           file: ./infra/prod/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ze_burger_payment:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ze_burguer_payment:latest
 
   deploy:
     name: Deploy
@@ -96,6 +97,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws_session_token: ${{ secrets.AWS_SESSION_TOKEN}}
         aws-region: ${{env.AWS_REGION}}
 
     - name: Update kube config

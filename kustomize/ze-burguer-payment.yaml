@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: ze-burguer-payment
-          image: marcosilva/ze_burger_payment:latest
+          image: marcosilva/ze_burguer_payment:latest
           ports:
             - containerPort: 8081
           envFrom:
@@ -34,7 +34,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: ze-burguer-payment
-  minReplicas: 1
+  minReplicas: 2
   maxReplicas: 5
   metrics:
   - type: Resource
