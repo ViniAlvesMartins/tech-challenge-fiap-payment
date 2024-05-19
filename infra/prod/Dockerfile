@@ -6,7 +6,7 @@ COPY go.mod go.sum ./
 
 COPY . .
 
-EXPOSE 8080
+EXPOSE 8081
 
 RUN go build -o ./api/main ./api/main.go
 

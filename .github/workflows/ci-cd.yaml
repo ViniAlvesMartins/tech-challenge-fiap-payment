@@ -7,20 +7,59 @@ on:
     branches:
       - "main"
 
+  pull_request:
+    types: [opened, synchronize, reopened]
 env:
-  # update pendent
   EKS_CLUSTER_NAME: eks-ze-burguer
   AWS_REGION: us-east-1
-  DATABASE_HOST: "zeburger-db.cpwm48q0wvgx.us-east-1.rds.amazonaws.com"
-  DATABASE_USERNAME: "zeburguer"
-  DATABASE_PORT: 5432
-  DATABASE_SCHEMA: "ze_burguer"
-  MIGRATIONS_DIR: "infra/database/migrations"
-  DATABASE_NAME: zeburguer
 
 jobs:
+  tests:
+    name: Run Tests 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup go
+        uses: actions/setup-go@v1
+        with:
+          go-version: '1.21'
+      - name: Script to remove
+        run: |
+          chmod +x remove_exceptions.sh
+      - name: Generate coverage file
+        run: |
+           go test $(./remove_exceptions.sh) -coverprofile cover.out
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v1
+        with:
+          name: code-coverage-report
+          path: cover.out
+  
+  sonarcloud:
+    name: SonarCloud
+    needs: [tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      
+      - name: Download code coverage results
+        uses: actions/download-artifact@v1
+        with:
+          name: code-coverage-report
+          path: cover.out
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
   build:
     name: Build 
+    needs: [sonarcloud]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -41,11 +80,11 @@ jobs:
           context: .
           file: ./infra/prod/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ze_burguer:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ze_burger_payment:latest
 
   deploy:
     name: Deploy
-    needs: [build, migration] 
+    needs: [build] 
     runs-on: ubuntu-latest
 
     steps:
