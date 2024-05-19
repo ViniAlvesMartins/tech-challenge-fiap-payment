@@ -1,6 +1,7 @@
 package use_case
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 
@@ -26,20 +27,18 @@ func NewPaymentUseCase(r contract.PaymentRepository, e contract.ExternalPaymentS
 	}
 }
 
-func (p *PaymentUseCase) Create(payment *entity.Payment) error {
-	if _, err := p.repository.Create(*payment); err != nil {
+func (p *PaymentUseCase) Create(ctx context.Context, payment *entity.Payment) error {
+	if _, err := p.repository.Create(ctx, *payment); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (p *PaymentUseCase) GetLastPaymentStatus(paymentId int) (enum.PaymentStatus, error) {
-
-	payment, err := p.repository.GetLastPaymentStatus(paymentId)
-
-	if err != nil && payment != nil {
-		return payment.CurrentState, err
+func (p *PaymentUseCase) GetLastPaymentStatus(ctx context.Context, paymentId int) (enum.PaymentStatus, error) {
+	payment, err := p.repository.GetLastPaymentStatus(ctx, paymentId)
+	if err != nil {
+		return enum.PENDING, err
 	}
 
 	if payment != nil && payment.CurrentState == "" {
@@ -49,9 +48,8 @@ func (p *PaymentUseCase) GetLastPaymentStatus(paymentId int) (enum.PaymentStatus
 	return payment.CurrentState, nil
 }
 
-func (p *PaymentUseCase) CreateQRCode(order *entity.Order) (*responsepaymentservice.CreateQRCode, error) {
-	lastPaymentStatus, err := p.GetLastPaymentStatus(order.ID)
-
+func (p *PaymentUseCase) CreateQRCode(ctx context.Context, order *entity.Order) (*responsepaymentservice.CreateQRCode, error) {
+	lastPaymentStatus, err := p.GetLastPaymentStatus(ctx, order.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -68,28 +66,21 @@ func (p *PaymentUseCase) CreateQRCode(order *entity.Order) (*responsepaymentserv
 		Amount:       order.Amount,
 	}
 
-	p.Create(payment)
+	p.Create(ctx, payment)
 
 	qrCode, _ := p.externalPaymentService.CreateQRCode(*payment)
 
 	return &qrCode, nil
 }
 
-func (p *PaymentUseCase) PaymentNotification(paymentId int) error {
-
-	_, err := p.repository.UpdateStatus(paymentId, enum.CONFIRMED)
-
-	if err != nil {
-		panic(err)
+func (p *PaymentUseCase) PaymentNotification(ctx context.Context, paymentId int) error {
+	if err := p.repository.UpdateStatus(ctx, paymentId, enum.CONFIRMED); err != nil {
+		return err
 	}
 
-	res, err := p.snsService.SendMessage(paymentId, enum.CONFIRMED)
-
-	if err != nil {
-		panic(err)
+	if err := p.snsService.SendMessage(paymentId, enum.CONFIRMED); err != nil {
+		return err
 	}
-
-	fmt.Println(res)
 
 	return nil
 }

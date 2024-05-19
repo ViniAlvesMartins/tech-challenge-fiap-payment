@@ -8,6 +8,7 @@ import (
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/handler/http_server"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/repository"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/service"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/pkg/uuid"
 	"github.com/go-resty/resty/v2"
 	"log/slog"
 	"os"
@@ -39,7 +40,7 @@ func main() {
 	orderService := service.NewOrderService(ordersHTTPClient, logger)
 	orderUseCase := use_case.NewOrderUseCase(orderService, logger)
 
-	paymentRepository := repository.NewPaymentRepository(db, logger)
+	paymentRepository := repository.NewPaymentRepository(db, logger, loadUUID())
 	snsService := service.NewSnsService()
 	externalPaymentService := service.NewExternalPayment()
 	paymentUseCase := use_case.NewPaymentUseCase(paymentRepository, externalPaymentService, snsService, logger)
@@ -52,6 +53,10 @@ func main() {
 		logger.Error("error running application", err)
 		panic(err)
 	}
+}
+
+func loadUUID() uuid.Interface {
+	return &uuid.UUID{}
 }
 
 func loadConfig() (infra.Config, error) {

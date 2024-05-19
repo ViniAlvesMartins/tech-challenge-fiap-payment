@@ -3,41 +3,37 @@ package repository
 import (
 	"context"
 	"fmt"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/contract"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/pkg/uuid"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/google/uuid"
+
 	"log/slog"
 	"strconv"
 )
 
+const table = "payments"
+
 type PaymentRepository struct {
-	db  *dynamodb.Client
-	log *slog.Logger
+	db   contract.DynamoDB
+	log  *slog.Logger
+	uuid uuid.Interface
 }
 
-func NewPaymentRepository(db *dynamodb.Client, log *slog.Logger) *PaymentRepository {
+func NewPaymentRepository(db contract.DynamoDB, log *slog.Logger, u uuid.Interface) *PaymentRepository {
 	return &PaymentRepository{
-		db:  db,
-		log: log,
+		db:   db,
+		log:  log,
+		uuid: u,
 	}
 }
 
-type Item struct {
-	Id      string `json:"pk"`
-	OrderId string `json:"sk"`
-	Type    string `json:"type"`
-	Status  string `json:"status"`
-	Amount  string `json:"amount"`
-}
-
-func (p *PaymentRepository) Create(payment entity.Payment) (*entity.Payment, error) {
-
-	table := "payments"
-	id := uuid.New().String()
+func (p *PaymentRepository) Create(ctx context.Context, payment entity.Payment) (*entity.Payment, error) {
+	id := p.uuid.NewString()
 
 	input := &dynamodb.PutItemInput{
 		Item: map[string]types.AttributeValue{
@@ -50,25 +46,18 @@ func (p *PaymentRepository) Create(payment entity.Payment) (*entity.Payment, err
 		TableName: aws.String(table),
 	}
 
-	_, err := p.db.PutItem(context.TODO(), input)
-
-	if err != nil {
-		fmt.Println("Got error calling PutItem:")
-		fmt.Println(err.Error())
+	if _, err := p.db.PutItem(ctx, input); err != nil {
+		return nil, err
 	}
 
 	payment.PaymentID = id
-
 	return &payment, nil
 }
 
-func (p *PaymentRepository) GetLastPaymentStatus(orderId int) (*entity.Payment, error) {
-
+func (p *PaymentRepository) GetLastPaymentStatus(ctx context.Context, orderId int) (*entity.Payment, error) {
 	payment := &entity.Payment{}
 
-	table := "payments"
-
-	out, err := p.db.GetItem(context.TODO(), &dynamodb.GetItemInput{
+	out, err := p.db.GetItem(ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(table),
 		Key: map[string]types.AttributeValue{
 			"orderId": &types.AttributeValueMemberS{Value: strconv.Itoa(payment.OrderID)},
@@ -76,22 +65,18 @@ func (p *PaymentRepository) GetLastPaymentStatus(orderId int) (*entity.Payment, 
 	})
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	err = attributevalue.UnmarshalMap(out.Item, &payment)
-
-	if err != nil {
-		panic(err)
+	if err = attributevalue.UnmarshalMap(out.Item, &payment); err != nil {
+		return nil, err
 	}
 
 	return payment, nil
 }
 
-func (p *PaymentRepository) UpdateStatus(orderId int, status enum.PaymentStatus) (bool, error) {
-	table := "payments"
-
-	_, err := p.db.UpdateItem(context.TODO(), &dynamodb.UpdateItemInput{
+func (p *PaymentRepository) UpdateStatus(ctx context.Context, orderId int, status enum.PaymentStatus) error {
+	if _, err := p.db.UpdateItem(ctx, &dynamodb.UpdateItemInput{
 		TableName: aws.String(table),
 		Key: map[string]types.AttributeValue{
 			"orderId": &types.AttributeValueMemberS{Value: strconv.Itoa(orderId)},
@@ -100,11 +85,9 @@ func (p *PaymentRepository) UpdateStatus(orderId int, status enum.PaymentStatus)
 		ExpressionAttributeValues: map[string]types.AttributeValue{
 			":currentState": &types.AttributeValueMemberS{Value: string(status)},
 		},
-	})
-
-	if err != nil {
-		panic(err)
+	}); err != nil {
+		return err
 	}
 
-	return true, nil
+	return nil
 }

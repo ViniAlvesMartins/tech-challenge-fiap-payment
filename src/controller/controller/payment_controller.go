@@ -101,7 +101,7 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	qrCode, err := p.paymentUseCase.CreateQRCode(order)
+	qrCode, err := p.paymentUseCase.CreateQRCode(r.Context(), order)
 
 	if err != nil {
 		p.logger.Error("error creating qr code", slog.Any("error", err.Error()))
@@ -163,7 +163,7 @@ func (p *PaymentController) GetLastPaymentStatus(w http.ResponseWriter, r *http.
 		return
 	}
 
-	paymentStatus, err := p.paymentUseCase.GetLastPaymentStatus(paymentId)
+	paymentStatus, err := p.paymentUseCase.GetLastPaymentStatus(r.Context(), paymentId)
 	if err != nil {
 		p.logger.Error("error getting last payment status", slog.Any("error", err.Error()))
 
@@ -220,7 +220,7 @@ func (p *PaymentController) Notification(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if err = p.paymentUseCase.PaymentNotification(paymentId); err != nil {
+	if err = p.paymentUseCase.PaymentNotification(r.Context(), paymentId); err != nil {
 		p.logger.Error("error processing payment notification", slog.Any("error", err.Error()))
 
 		w.WriteHeader(http.StatusInternalServerError)
