@@ -2,7 +2,9 @@ package use_case
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"log/slog"
 
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/contract"
@@ -36,8 +38,13 @@ func (p *PaymentUseCase) Create(ctx context.Context, payment *entity.Payment) er
 }
 
 func (p *PaymentUseCase) GetLastPaymentStatus(ctx context.Context, paymentId int) (enum.PaymentStatus, error) {
+	var notFoundErr *types.ResourceNotFoundException
+
 	payment, err := p.repository.GetLastPaymentStatus(ctx, paymentId)
 	if err != nil {
+		if errors.As(err, &notFoundErr) {
+			return enum.PENDING, nil
+		}
 		return enum.PENDING, err
 	}
 
