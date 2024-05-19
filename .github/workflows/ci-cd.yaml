@@ -26,10 +26,10 @@ jobs:
           go-version: '1.21'
       - name: Script to remove
         run: |
-          chmod +x remove_exception.sh
+          chmod +x remove_exceptions.sh
       - name: Generate coverage file
         run: |
-           go test $(./remove_exception.sh) -coverprofile cover.out
+           go test $(./remove_exceptions.sh) -coverprofile cover.out
       - name: Archive code coverage results
         uses: actions/upload-artifact@v1
         with:
