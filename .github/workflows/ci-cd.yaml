@@ -10,7 +10,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 env:
-  EKS_CLUSTER_NAME: eks-ze-burguer
+  EKS_CLUSTER_NAME: eks-ze-burger
   AWS_REGION: us-east-1
 
 jobs:

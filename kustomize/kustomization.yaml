@@ -1,5 +1,5 @@
 resources:
 - namespace.yaml
-- ze-burguer-payment.yaml
+- ze-burger-payment.yaml
 
 namespace: tech-challenge
