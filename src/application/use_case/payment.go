@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"log/slog"
+	"strconv"
 
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/contract"
 	responsepaymentservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/modules/response/payment_service"
@@ -67,7 +68,7 @@ func (p *PaymentUseCase) CreateQRCode(ctx context.Context, order *entity.Order) 
 	}
 
 	payment := &entity.Payment{
-		OrderID:      order.ID,
+		OrderID:      strconv.Itoa(order.ID),
 		Type:         enum.QRCODE,
 		CurrentState: enum.PENDING,
 		Amount:       order.Amount,
