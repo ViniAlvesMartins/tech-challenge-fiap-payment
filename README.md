@@ -72,7 +72,10 @@ Flexibilidade de Schema: DynamoDB permite ajustes no schema das tabelas sem a ne
 
 ## Arquitetura cloud
 
-![Arquitetura_cloud](./doc/arquitetura/cloud_arch.png)
+![Arquitetura_cloud_v2](./doc/arquitetura/cloud_arch_v2.png)
+
+![Arquitetura_cloud_v2_detail](./doc/arquitetura/cloud_arch_v2_detail.png)
+
 
 ---
 
@@ -135,11 +138,11 @@ Para criar os recursos
 Com a execução acima será criado a seguinte infraestrutura:
 
 Services
- - ze-burguer: NodePort 30443
+ - ze-burguer-payment: NodePort 30443
  - postgres: NodePort 30432
 
 Deployments
- - ze-burguer: HPA (2-5 Pods) - CPU Average Usage metrics
+ - ze-burguer-payment: HPA (2-5 Pods) - CPU Average Usage metrics
  - postgres: 1 Pod
 
 ![K8S](./doc/infra/kubernetes.png)
@@ -148,32 +151,12 @@ Deployments
 
 [Collection_Postman](./doc/apis/Ze_burguer.postman_collection.json) (necessário importar as ENVS que costam na mesma pasta)
 
-#### Base URL: http://localhost:8080
+#### Base URL: http://localhost:8081
 
-#### Doc Swagger: http://localhost:8080/docs/index.html
+#### Doc Swagger: http://localhost:8081/docs/index.html
 
 #### Passo a passo para execução das APIs
 
-  - Categorias dos produtos:
-    - | Id | Categoria  |
-      | -- | ---------- |
-      | 1  | Lanche     |
-      | 2  | Bebida     |
-      | 3  | Acompanhamento   |
-      | 4  | Sobremesa  |
+ - Passo 1: Criar um pagamento (Etapa de criação do Qr Code) (`http://localhost:port/payments`)
+ - Passo 2: Realizar uma chamada na API de `Notification Payment` (WEBHOOK responsável por confirmar o pagamento e atualizar o Status do pedido) (`http://localhost:port/payments/9/notification-payments`)
 
-  - Status do pedido:
-    - | Status | 
-      | ------ | 
-      | AWAITING_PAYMENT  | 
-      | RECEIVED  | 
-      | PREPARING  | 
-      | READY  | 
-      | FINISHED |
-
- - Passo 1: Cadastrar os Produtos desejados (`http://localhost:port/products`)
- - Passo 2: Cadastrar o cliente (etapa opcional) (`http://localhost:port/clients`)
- - Passo 3: Criar um pedido com os produtos cadastrados (pode ou não informar o id do cliente cadastrado) (`http://localhost:port/orders`)
- - Passo 4: Criar um pagamento (Etapa de criação do Qr Code) (`http://localhost:port/orders/{id_order}/payments`)
- - Passo 5: Realizar uma chamada na API de `Notification Payment` (WEBHOOK responsável por confirmar o pagamento e atualizar o Status do pedido) (`http://localhost:port/orders/{id_order}/notification-payments`)
- - Passo 6: Realizar a atualização de status através da API Patch de pedidos (`http://localhost:port/orders/{id_order}`)
