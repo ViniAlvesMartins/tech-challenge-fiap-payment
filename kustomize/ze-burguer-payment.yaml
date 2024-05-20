@@ -15,11 +15,9 @@ spec:
         - name: ze-burguer-payment
           image: marcosilva/ze_burguer_payment:latest
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
           envFrom:
           - configMapRef:
-              name: ze-burguer-payment
-          - secretRef:
               name: ze-burguer-payment
           resources:
             requests:
@@ -66,19 +64,11 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 8080
-# ---
-# apiVersion: v1
-# kind: ConfigMap
-# metadata:
-#   name: ze-burguer-payment
-# data:
-# # UPDATE LOCAL ENVS
-# ---
-# apiVersion: v1
-# kind: Secret
-# metadata:
-#   name: ze-burguer-payment
-# type: Opaque
-# data:
-#   DATABASE_PASSWORD: VTJUTEtSMEZtOXU3dkFUZgo=
+      targetPort: 8081
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ze-burguer-payment
+data:
+  ORDERS_URL: "http://ze-burguer.tech-challenge.svc.cluster.local"
