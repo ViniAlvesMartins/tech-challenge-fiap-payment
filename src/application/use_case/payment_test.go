@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"log/slog"
 	"os"
+	"strconv"
 	"testing"
 )
 
@@ -22,7 +23,7 @@ func TestPaymentUseCase_Create(t *testing.T) {
 		ctx := context.Background()
 
 		payment := entity.Payment{
-			OrderID:      1,
+			OrderID:      "1",
 			Type:         enum.QRCODE,
 			CurrentState: enum.PENDING,
 			Amount:       123.45,
@@ -50,7 +51,7 @@ func TestPaymentUseCase_Create(t *testing.T) {
 		expectedErr := errors.New("error connecting to database")
 
 		payment := entity.Payment{
-			OrderID:      1,
+			OrderID:      "1",
 			Type:         enum.QRCODE,
 			CurrentState: enum.PENDING,
 			Amount:       123.45,
@@ -98,7 +99,7 @@ func TestPaymentUseCase_GetLastPaymentStatus(t *testing.T) {
 
 		payment := &entity.Payment{
 			PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
-			OrderID:      1,
+			OrderID:      "1",
 			Type:         enum.QRCODE,
 			CurrentState: enum.PENDING,
 			Amount:       132.45,
@@ -139,7 +140,7 @@ func TestPaymentUseCase_CreateQRCode(t *testing.T) {
 
 		payment := &entity.Payment{
 			PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
-			OrderID:      order.ID,
+			OrderID:      strconv.Itoa(order.ID),
 			Type:         enum.QRCODE,
 			CurrentState: enum.PENDING,
 			Amount:       order.Amount,
@@ -177,7 +178,7 @@ func TestPaymentUseCase_CreateQRCode(t *testing.T) {
 
 		payment := &entity.Payment{
 			PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
-			OrderID:      order.ID,
+			OrderID:      strconv.Itoa(order.ID),
 			Type:         enum.QRCODE,
 			CurrentState: enum.CONFIRMED,
 			Amount:       order.Amount,
@@ -285,7 +286,7 @@ func lastPaymentStatusPayments() []paymentTest {
 		{
 			Payment: &entity.Payment{
 				PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
-				OrderID:      1,
+				OrderID:      "1",
 				Type:         enum.QRCODE,
 				CurrentState: enum.PENDING,
 				Amount:       132.45,
@@ -296,7 +297,7 @@ func lastPaymentStatusPayments() []paymentTest {
 		{
 			Payment: &entity.Payment{
 				PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f1",
-				OrderID:      1,
+				OrderID:      "1",
 				Type:         enum.QRCODE,
 				CurrentState: "",
 				Amount:       132.45,

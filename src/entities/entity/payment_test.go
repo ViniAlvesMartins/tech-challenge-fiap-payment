@@ -2,16 +2,17 @@ package entity
 
 import (
 	"encoding/json"
+	"testing"
+
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/entities/enum"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestPayment_GetJSONValue(t *testing.T) {
 	t.Run("get json value successfully", func(t *testing.T) {
 		p := Payment{
 			PaymentID:    "1",
-			OrderID:      1,
+			OrderID:      "1",
 			Type:         enum.QRCODE,
 			CurrentState: enum.PENDING,
 			Amount:       123.45,
