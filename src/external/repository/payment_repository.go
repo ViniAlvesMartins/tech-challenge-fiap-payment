@@ -37,7 +37,7 @@ func (p *PaymentRepository) Create(ctx context.Context, payment entity.Payment) 
 
 	input := &dynamodb.PutItemInput{
 		Item: map[string]types.AttributeValue{
-			"orderId":      &types.AttributeValueMemberN{Value: strconv.Itoa(payment.OrderID)},
+			"orderId":      &types.AttributeValueMemberS{Value: payment.OrderID},
 			"paymentId":    &types.AttributeValueMemberS{Value: id},
 			"type":         &types.AttributeValueMemberS{Value: string(payment.Type)},
 			"currentState": &types.AttributeValueMemberS{Value: string(payment.CurrentState)},
@@ -60,7 +60,7 @@ func (p *PaymentRepository) GetLastPaymentStatus(ctx context.Context, orderId in
 	out, err := p.db.GetItem(ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(table),
 		Key: map[string]types.AttributeValue{
-			"orderId": &types.AttributeValueMemberN{Value: strconv.Itoa(orderId)},
+			"orderId": &types.AttributeValueMemberS{Value: strconv.Itoa(orderId)},
 		},
 	})
 

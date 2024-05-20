@@ -56,16 +56,17 @@ Aplicação responsável pela gestão de pedidos da hamburgueria Zé do Burguer 
 
 ## Database
 
-![postgresql](./doc/arquitetura/database.png)
+![dynamodb](./doc/arquitetura/database.png)
 
-Alguns pontos foram considerados para o uso de banco relacional na nossa solução, dentre eles podemos destacar: a natureza relacional entre as entidades e sua estrutura pouco flexível; o conhecimento difundido do SQL, dentre os integrante do grupo, como linguagem para interface com o banco de dados; conformidade com ACID(atomicidade, consistência, isolamento e durabilidade).
+Alguns pontos foram considerados para o uso do DynamoDB na nossa solução, dentre eles podemos destacar: escalabilidade, desempenho, serverless, alta disponibilidade 
 
-Dada a natureza da aplicação desenvolvida, levamos em consideração também a vantagem dos bancos de dados relacionais, em relação á flexibilidade para executar consultas mais complexas,
-estratégia de indexação a mais tempo sendo colocadas á prova e a consistência dos dados sobre os bancos não relacionais.
+Dada a natureza da aplicação desenvolvida, levamos em consideração também a vantagem do NoSQL, em relação á performance na escrita. 
 
-Entre as opções de RDBMS, escolhemos o PostgreSQL por conta de extensa adoção no mercado, aumentando a gama de material de suporte disponível; seu controle de concorrência, que por padrão evita que transações não salvas afetem outras transações;
-compatibilidade com as principais soluções de banco de dados como serviço do mercado(Amazon RDS, Microsoft Azure e Google GCP). O PostgreSQL também oferece diversas funções que facilitam o desenvolvimento, como:
-uma vasta quantidade de tipos de dados; suporte nativo a UUID(identificador único universal);e controle de acesso granular, permitindo acesso á apenas o que for necessário ao usuário da aplicação.
+Entre as opções de bancos NoSQL, escolhemos o DynamoDB devido a sua integração nativa com o ecossistema AWS. Isso nos proporciona:
+
+Agilidade no Desenvolvimento: A integração com outros serviços AWS facilita a implementação e acelera o ciclo de desenvolvimento.
+
+Flexibilidade de Schema: DynamoDB permite ajustes no schema das tabelas sem a necessidade de migrações complexas, adaptando-se facilmente às mudanças nos requisitos da aplicação.
 
 ---
 

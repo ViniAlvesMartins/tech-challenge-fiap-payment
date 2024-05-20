@@ -13,7 +13,7 @@ type PaymentInterface interface {
 
 type Payment struct {
 	PaymentID    string             `json:"paymentId"`
-	OrderID      int                `json:"orderId"`
+	OrderID      string             `json:"orderId"`
 	Type         enum.PaymentType   `json:"type"`
 	CurrentState enum.PaymentStatus `json:"status"`
 	Amount       float32            `json:"amount"`

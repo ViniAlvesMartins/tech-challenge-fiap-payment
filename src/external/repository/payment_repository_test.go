@@ -34,7 +34,7 @@ func TestPaymentRepository_Create(t *testing.T) {
 
 		p := entity.Payment{
 			PaymentID:    paymentId.String(),
-			OrderID:      1,
+			OrderID:      "1",
 			Type:         enum.QRCODE,
 			CurrentState: enum.PENDING,
 			Amount:       123.45,
@@ -62,7 +62,7 @@ func TestPaymentRepository_Create(t *testing.T) {
 
 		p := entity.Payment{
 			PaymentID:    paymentId.String(),
-			OrderID:      1,
+			OrderID:      "1",
 			Type:         enum.QRCODE,
 			CurrentState: enum.PENDING,
 			Amount:       123.45,
@@ -87,7 +87,7 @@ func TestPaymentRepository_GetLastPaymentStatus(t *testing.T) {
 
 		p := &entity.Payment{
 			PaymentID:    paymentId.String(),
-			OrderID:      1,
+			OrderID:      "1",
 			Type:         enum.QRCODE,
 			CurrentState: enum.PENDING,
 			Amount:       123.45,
@@ -95,7 +95,7 @@ func TestPaymentRepository_GetLastPaymentStatus(t *testing.T) {
 
 		dynamoOutput := &dynamodb.GetItemOutput{
 			Item: map[string]types.AttributeValue{
-				"orderId":      &types.AttributeValueMemberN{Value: strconv.Itoa(p.OrderID)},
+				"orderId":      &types.AttributeValueMemberS{Value: p.OrderID},
 				"paymentId":    &types.AttributeValueMemberS{Value: p.PaymentID},
 				"type":         &types.AttributeValueMemberS{Value: string(p.Type)},
 				"currentState": &types.AttributeValueMemberS{Value: string(p.CurrentState)},
@@ -107,7 +107,8 @@ func TestPaymentRepository_GetLastPaymentStatus(t *testing.T) {
 		db.EXPECT().GetItem(ctx, gomock.Any()).Times(1).Return(dynamoOutput, nil)
 
 		repo := NewPaymentRepository(db, logger, uuidMock)
-		payment, err := repo.GetLastPaymentStatus(ctx, p.OrderID)
+		result, _ := strconv.Atoi(p.OrderID)
+		payment, err := repo.GetLastPaymentStatus(ctx, result)
 
 		assert.Nil(t, err)
 		assert.Equal(t, *p, *payment)
@@ -124,7 +125,7 @@ func TestPaymentRepository_GetLastPaymentStatus(t *testing.T) {
 
 		p := &entity.Payment{
 			PaymentID:    paymentId.String(),
-			OrderID:      1,
+			OrderID:      "1",
 			Type:         enum.QRCODE,
 			CurrentState: enum.PENDING,
 			Amount:       123.45,
@@ -134,7 +135,8 @@ func TestPaymentRepository_GetLastPaymentStatus(t *testing.T) {
 		db.EXPECT().GetItem(ctx, gomock.Any()).Times(1).Return(nil, expectedErr)
 
 		repo := NewPaymentRepository(db, logger, uuidMock)
-		payment, err := repo.GetLastPaymentStatus(ctx, p.OrderID)
+		result, _ := strconv.Atoi(p.OrderID)
+		payment, err := repo.GetLastPaymentStatus(ctx, result)
 
 		assert.ErrorIs(t, expectedErr, err)
 		assert.Nil(t, payment)
@@ -151,7 +153,7 @@ func TestPaymentRepository_GetLastPaymentStatus(t *testing.T) {
 
 		p := &entity.Payment{
 			PaymentID:    paymentId.String(),
-			OrderID:      1,
+			OrderID:      "1",
 			Type:         enum.QRCODE,
 			CurrentState: enum.PENDING,
 			Amount:       123.45,
@@ -159,7 +161,7 @@ func TestPaymentRepository_GetLastPaymentStatus(t *testing.T) {
 
 		dynamoOutput := &dynamodb.GetItemOutput{
 			Item: map[string]types.AttributeValue{
-				"orderId":      &types.AttributeValueMemberS{Value: strconv.Itoa(p.OrderID)},
+				"orderId":      &types.AttributeValueMemberS{Value: p.OrderID},
 				"paymentId":    &types.AttributeValueMemberS{Value: p.PaymentID},
 				"type":         &types.AttributeValueMemberS{Value: string(p.Type)},
 				"currentState": &types.AttributeValueMemberS{Value: string(p.CurrentState)},
@@ -171,7 +173,8 @@ func TestPaymentRepository_GetLastPaymentStatus(t *testing.T) {
 		db.EXPECT().GetItem(ctx, gomock.Any()).Times(1).Return(dynamoOutput, nil)
 
 		repo := NewPaymentRepository(db, logger, uuidMock)
-		payment, err := repo.GetLastPaymentStatus(ctx, p.OrderID)
+		result, _ := strconv.Atoi(p.OrderID)
+		payment, err := repo.GetLastPaymentStatus(ctx, result)
 
 		assert.Errorf(t, expectedErr, err.Error())
 		assert.Nil(t, payment)
