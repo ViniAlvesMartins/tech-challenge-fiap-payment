@@ -22,6 +22,8 @@ Aplicação responsável pela gestão de pedidos da hamburgueria Zé do Burguer 
 
 [APIs](#documentação-da-api)
 
+[Sonar](#sonar)
+
 ---
 
 ## Arquitetura
@@ -160,3 +162,6 @@ Deployments
  - Passo 1: Criar um pagamento (Etapa de criação do Qr Code) (`http://localhost:port/payments`)
  - Passo 2: Realizar uma chamada na API de `Notification Payment` (WEBHOOK responsável por confirmar o pagamento e atualizar o Status do pedido) (`http://localhost:port/payments/9/notification-payments`)
 
+## Sonar
+
+![Sonar](./doc/sonar.png)
