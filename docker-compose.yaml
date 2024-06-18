@@ -12,7 +12,7 @@ services:
     container_name: app.ze-burger-payments.dev
     env_file: .env
     build:
-      dockerfile: ./infra/local/Dockerfile
+      dockerfile: ./infra/docker/local/Dockerfile
       context: ./
     volumes:
       - .:/app
