@@ -14,8 +14,6 @@ import (
 	"os"
 )
 
-// @title           Ze Burguer Payment APIs
-// @version         1.0
 func main() {
 	var err error
 	var ctx = context.Background()

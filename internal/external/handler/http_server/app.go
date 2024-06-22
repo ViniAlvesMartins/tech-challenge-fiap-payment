@@ -2,14 +2,14 @@ package http_server
 
 import (
 	"context"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/doc/swagger"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 	"log/slog"
 	"net/http"
 
 	_ "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/doc/swagger"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/controller/controller"
-	"github.com/swaggo/http-swagger/v2"
-
 	"github.com/gorilla/mux"
 )
 
@@ -37,6 +37,9 @@ func (e *App) Run(ctx context.Context) error {
 	router.HandleFunc("/payments", paymentController.CreatePayment).Methods("POST")
 	router.HandleFunc("/payments/{paymentId:[0-9]+}/status", paymentController.GetLastPaymentStatus).Methods("GET")
 	router.HandleFunc("/payments/{paymentId:[0-9]+}/notification-payments", paymentController.Notification).Methods("POST")
+
+	swagger.SwaggerInfo.Title = "Ze Burguer Payment API"
+	swagger.SwaggerInfo.Version = "1.0"
 
 	router.PathPrefix("/docs").Handler(httpSwagger.WrapHandler)
 
