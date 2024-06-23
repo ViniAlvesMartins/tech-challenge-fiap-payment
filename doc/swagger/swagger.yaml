@@ -33,52 +33,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /orders/{id}/notification-payments:
-    post:
-      consumes:
-      - application/json
-      description: Payment confirmation webhook
-      parameters:
-      - description: Payment properties
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/input.PaymentDto'
-      - description: Order ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            allOf:
-            - $ref: '#/definitions/swagger.ResourceNotFoundResponse'
-            - properties:
-                data:
-                  type: object
-              type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            allOf:
-            - $ref: '#/definitions/swagger.InternalServerErrorResponse'
-            - properties:
-                data:
-                  type: object
-              type: object
-      summary: Payment confirmation webhook
-      tags:
-      - Payments
-  /orders/{id}/payments:
+  /payments:
     post:
       consumes:
       - application/json
@@ -90,11 +45,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/input.PaymentDto'
-      - description: Order ID
-        in: path
-        name: id
-        required: true
-        type: integer
       produces:
       - application/json
       responses:
@@ -128,13 +78,52 @@ paths:
       summary: Start payment process
       tags:
       - Payments
-  /orders/{id}/status-payment:
+  /payments/{id}/notification-payments:
+    post:
+      consumes:
+      - application/json
+      description: Payment confirmation webhook
+      parameters:
+      - description: Payment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.ResourceNotFoundResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.InternalServerErrorResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Payment confirmation webhook
+      tags:
+      - Payments
+  /payments/{id}/status:
     get:
       consumes:
       - application/json
       description: Get status for order last payment try
       parameters:
-      - description: Order ID
+      - description: Payment ID
         in: path
         name: id
         required: true

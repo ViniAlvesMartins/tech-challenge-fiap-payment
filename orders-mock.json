@@ -1,0 +1,80 @@
+{
+  "uuid": "ba89b6f4-75b3-4b66-92e2-553f8aef960d",
+  "lastMigration": 32,
+  "name": "Orders",
+  "endpointPrefix": "",
+  "latency": 0,
+  "port": 8002,
+  "hostname": "",
+  "folders": [],
+  "routes": [
+    {
+      "uuid": "8e019325-b11c-468a-a0a9-526eb79fb586",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "orders/:param1",
+      "responses": [
+        {
+          "uuid": "0e74ddf3-38fb-4004-927b-ff22271be916",
+          "body": "{\n  \"error\": \"\",\n  \"data\": {\n    \"id\": 1,\n    \"client_id\": null,\n    \"status_order\": \"PENDING\",\n    \"amount\": 123.45\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null
+    }
+  ],
+  "rootChildren": [
+    {
+      "type": "route",
+      "uuid": "8e019325-b11c-468a-a0a9-526eb79fb586"
+    }
+  ],
+  "proxyMode": false,
+  "proxyHost": "",
+  "proxyRemovePrefix": false,
+  "tlsOptions": {
+    "enabled": false,
+    "type": "CERT",
+    "pfxPath": "",
+    "certPath": "",
+    "keyPath": "",
+    "caPath": "",
+    "passphrase": ""
+  },
+  "cors": true,
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "proxyReqHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "proxyResHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "data": [],
+  "callbacks": []
+}

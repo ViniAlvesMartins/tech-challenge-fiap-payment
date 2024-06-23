@@ -40,11 +40,10 @@ func NewPaymentController(p contract.PaymentUseCase, logger *slog.Logger, orderU
 // @Accept       json
 // @Produce      json
 // @Param        request   body      input.PaymentDto  true  "Payment properties"
-// @Param        id   path      int  true  "Order ID"
 // @Success      201  {object}  Response{data=string}
 // @Failure      500  {object}  swagger.InternalServerErrorResponse{data=interface{}}
 // @Failure      404  {object}  swagger.ResourceNotFoundResponse{data=interface{}}
-// @Router       /orders/{id}/payments [post]
+// @Router       /payments [post]
 func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request) {
 	var paymentDTO dto.PaymentDto
 	var response Response
@@ -142,10 +141,10 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 // @Tags         Payments
 // @Accept       json
 // @Produce      json
-// @Param        id   path      int  true  "Order ID"
+// @Param        id   path      int  true  "Payment ID"
 // @Success      200  {object}  Response{data=string}
 // @Failure      500  {object}  swagger.InternalServerErrorResponse{data=interface{}}
-// @Router       /orders/{id}/status-payment [get]
+// @Router       /payments/{id}/status [get]
 func (p *PaymentController) GetLastPaymentStatus(w http.ResponseWriter, r *http.Request) {
 	paymentIdParam := mux.Vars(r)["paymentId"]
 	paymentId, err := strconv.Atoi(paymentIdParam)
@@ -197,12 +196,11 @@ func (p *PaymentController) GetLastPaymentStatus(w http.ResponseWriter, r *http.
 // @Tags         Payments
 // @Accept       json
 // @Produce      json
-// @Param        request   body      input.PaymentDto  true  "Payment properties"
-// @Param        id   path      int  true  "Order ID"
+// @Param        id   path      int  true  "Payment ID"
 // @Success      201  {object}  interface{}
 // @Failure      404  {object}  swagger.ResourceNotFoundResponse{data=interface{}}
 // @Failure      500  {object}  swagger.InternalServerErrorResponse{data=interface{}}
-// @Router       /orders/{id}/notification-payments [post]
+// @Router       /payments/{id}/notification-payments [post]
 func (p *PaymentController) Notification(w http.ResponseWriter, r *http.Request) {
 	paymentIdParam := mux.Vars(r)["paymentId"]
 

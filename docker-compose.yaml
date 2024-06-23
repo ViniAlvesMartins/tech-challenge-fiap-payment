@@ -2,8 +2,13 @@ version: '3.9'
 
 services:
   dynamodb-local:
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
     image: amazon/dynamodb-local:latest
+    user: root
+    volumes:
+      - dynamodb-volume:/home/dynamodblocal/data
     container_name: dynamodb-local
+    working_dir: /home/dynamodblocal
     ports:
       - "8000:8000"
     networks:
@@ -20,6 +25,19 @@ services:
       - 8081:8081
     networks:
       - dev-networks
+  mock-server:
+    container_name: app.ze-burger-payments.orders-mock.dev
+    image: mockoon/cli:latest
+    command: [ "--data", "data", "--port", "8002" ]
+    ports:
+      - 8002:8002
+    volumes:
+      - ./orders-mock.json:/data:readonly
+    networks:
+      - dev-networks
+
+volumes:
+  dynamodb-volume:
 
 networks:
   dev-networks:
