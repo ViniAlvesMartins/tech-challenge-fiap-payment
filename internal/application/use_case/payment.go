@@ -86,7 +86,12 @@ func (p *PaymentUseCase) PaymentNotification(ctx context.Context, paymentId int)
 		return err
 	}
 
-	if err := p.snsService.SendMessage(paymentId, enum.CONFIRMED); err != nil {
+	payment := entity.PaymentMessage{
+		OrderId: paymentId,
+		Status:  enum.CONFIRMED,
+	}
+
+	if err := p.snsService.SendMessage(ctx, payment); err != nil {
 		return err
 	}
 

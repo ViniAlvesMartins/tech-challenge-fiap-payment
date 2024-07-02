@@ -1,4 +1,4 @@
-package service
+package external_payment
 
 import (
 	response_payment_service "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/payment_service"

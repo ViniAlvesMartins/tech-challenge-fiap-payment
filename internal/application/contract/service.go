@@ -2,10 +2,11 @@
 package contract
 
 import (
+	"context"
 	responseorderservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/order_service"
 	responsepaymentservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/payment_service"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/sns_producer"
 )
 
 type ExternalPaymentService interface {
@@ -17,5 +18,5 @@ type OrderService interface {
 }
 
 type SnsService interface {
-	SendMessage(paymentId int, status enum.PaymentStatus) error
+	SendMessage(ctx context.Context, message sns_producer.Message) error
 }

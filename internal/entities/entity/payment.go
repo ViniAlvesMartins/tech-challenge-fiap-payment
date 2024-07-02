@@ -22,6 +22,11 @@ type Payment struct {
 	DeletedAt    *time.Time         `json:"deleted_at,omitempty"`
 }
 
+type PaymentMessage struct {
+	OrderId int
+	Status  enum.PaymentStatus
+}
+
 func (p *Payment) GetJSONValue() (string, error) {
 	b, err := json.Marshal(p)
 
