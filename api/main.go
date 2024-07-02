@@ -2,20 +2,18 @@ package main
 
 import (
 	"context"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/infra"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/application/use_case"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/database/dynamodb"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/handler/http_server"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/repository"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/external/service"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/src/pkg/uuid"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/use_case"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/config"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/handler/http_server"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/repository"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/pkg/dynamodb"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/pkg/uuid"
 	"github.com/go-resty/resty/v2"
 	"log/slog"
 	"os"
 )
 
-// @title           Ze Burguer Payment APIs
-// @version         1.0
 func main() {
 	var err error
 	var ctx = context.Background()
@@ -28,8 +26,7 @@ func main() {
 		panic(err)
 	}
 
-	db, err := dynamodb.NewConnection(cfg)
-
+	db, err := dynamodb.NewConnection(ctx, cfg.DynamoDBRegion, cfg.DynamoDBUrl, cfg.DynamoDBAccessKey, cfg.DynamoDBSecretAccess)
 	if err != nil {
 		logger.Error("error connecting to database", err)
 		panic(err)
@@ -59,8 +56,8 @@ func loadUUID() uuid.Interface {
 	return &uuid.UUID{}
 }
 
-func loadConfig() (infra.Config, error) {
-	return infra.NewConfig()
+func loadConfig() (config.Config, error) {
+	return config.NewConfig()
 }
 
 func loadLogger() *slog.Logger {

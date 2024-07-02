@@ -7,6 +7,9 @@ run-dev:
 run-prod:
 	docker-compose -f docker-compose.prod.yaml up
 
+swagger:
+	docker-compose run dev-app-payment swag init -g internal/external/handler/http_server/app.go -o doc/swagger/
+
 mocks:
 	docker-compose run dev-app-payment go generate ./...
 
