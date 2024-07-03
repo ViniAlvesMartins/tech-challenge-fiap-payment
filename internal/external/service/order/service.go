@@ -8,16 +8,16 @@ import (
 	"log/slog"
 )
 
-type OrderService struct {
+type Service struct {
 	client *resty.Client
 	logger *slog.Logger
 }
 
-func NewOrderService(c *resty.Client, l *slog.Logger) *OrderService {
-	return &OrderService{logger: l, client: c}
+func NewService(c *resty.Client, l *slog.Logger) *Service {
+	return &Service{logger: l, client: c}
 }
 
-func (o *OrderService) GetById(id int) (*responseorderservice.GetByIdResp, error) {
+func (o *Service) GetById(id int) (*responseorderservice.GetByIdResp, error) {
 	var order responseorderservice.GetByIdResp
 
 	resp, err := o.client.R().

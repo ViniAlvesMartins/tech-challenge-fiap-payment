@@ -9,7 +9,14 @@ type Config struct {
 	DynamoDBUrl          string `envconfig:"dynamodb_url"`
 	DynamoDBAccessKey    string `envconfig:"dynamodb_access_key"`
 	DynamoDBSecretAccess string `envconfig:"dynamodb_secret_access"`
-	OrdersURL            string `envconfig:"orders_url"`
+
+	SnsRegion       string `envconfig:"sns_region"`
+	SnsUrl          string `envconfig:"sns_url"`
+	SnsAccessKey    string `envconfig:"sns_access_key"`
+	SnsTopic        string `envconfig:"sns_topic"`
+	SnsSecretAccess string `envconfig:"sns_secret_access"`
+
+	OrdersURL string `envconfig:"orders_url"`
 }
 
 func NewConfig() (cfg Config, err error) {

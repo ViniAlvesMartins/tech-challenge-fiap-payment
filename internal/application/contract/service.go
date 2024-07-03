@@ -6,7 +6,6 @@ import (
 	responseorderservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/order_service"
 	responsepaymentservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/payment_service"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/sns_producer"
 )
 
 type ExternalPaymentService interface {
@@ -18,5 +17,5 @@ type OrderService interface {
 }
 
 type SnsService interface {
-	SendMessage(ctx context.Context, message sns_producer.Message) error
+	SendMessage(ctx context.Context, message entity.PaymentMessage) error
 }
