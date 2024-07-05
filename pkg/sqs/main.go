@@ -14,10 +14,8 @@ type Service struct {
 	waitTime          int32
 }
 
-func NewConnection(ctx context.Context, region string, queueUrl string, messagesMaxNumber, waitTime int32) (*Service, error) {
-	cfg, err := config.LoadDefaultConfig(ctx,
-		config.WithRegion(region),
-	)
+func NewConnection(ctx context.Context, queueUrl string, messagesMaxNumber, waitTime int32) (*Service, error) {
+	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		return nil, err
 	}

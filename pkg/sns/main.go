@@ -13,10 +13,8 @@ type Service struct {
 	topic  string
 }
 
-func NewConnection(ctx context.Context, region, topic string) (*Service, error) {
-	cfg, err := config.LoadDefaultConfig(ctx,
-		config.WithRegion(region),
-	)
+func NewConnection(ctx context.Context, topic string) (*Service, error) {
+	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
