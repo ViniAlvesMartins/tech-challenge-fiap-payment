@@ -30,7 +30,7 @@ func main() {
 		panic(err)
 	}
 
-	db, err := dynamodb.NewConnection(ctx, cfg.DynamoDBRegion, cfg.DynamoDBUrl, cfg.DynamoDBAccessKey, cfg.DynamoDBSecretAccess)
+	db, err := dynamodb.NewConnection(ctx)
 	if err != nil {
 		logger.Error("error connecting to database", err)
 		panic(err)
