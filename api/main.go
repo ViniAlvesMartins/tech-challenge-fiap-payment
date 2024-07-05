@@ -8,12 +8,12 @@ import (
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/repository"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/external_payment"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/order"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/sns_producer"
+	snsproducer "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/sns"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/pkg/sns"
+	"github.com/go-resty/resty/v2"
 
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/pkg/dynamodb"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/pkg/uuid"
-	"github.com/go-resty/resty/v2"
 	"log/slog"
 	"os"
 )
@@ -42,13 +42,13 @@ func main() {
 	orderUseCase := use_case.NewOrderUseCase(orderService, logger)
 
 	paymentRepository := repository.NewPaymentRepository(db, logger, loadUUID())
-	snsConnection, err := sns.NewConnection(ctx, cfg.SnsRegion, cfg.SnsTopic)
+	snsConnection, err := sns.NewConnection(ctx, cfg.SnsTopic)
 	if err != nil {
 		logger.Error("error connecting to sns", err)
 		panic(err)
 	}
 
-	snsService := sns_producer.NewService(snsConnection)
+	snsService := snsproducer.NewService(snsConnection)
 	externalPaymentService := external_payment.NewService()
 	paymentUseCase := use_case.NewPaymentUseCase(paymentRepository, externalPaymentService, snsService, logger)
 
