@@ -82,6 +82,7 @@ func (p *PaymentUseCase) CreateQRCode(ctx context.Context, order *entity.Order) 
 }
 
 func (p *PaymentUseCase) PaymentNotification(ctx context.Context, paymentId int) error {
+	// implement db transaction for SAGA
 	if err := p.repository.UpdateStatus(ctx, paymentId, enum.CONFIRMED); err != nil {
 		return err
 	}

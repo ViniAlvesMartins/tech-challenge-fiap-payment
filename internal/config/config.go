@@ -10,11 +10,11 @@ type Config struct {
 	DynamoDBAccessKey    string `envconfig:"dynamodb_access_key"`
 	DynamoDBSecretAccess string `envconfig:"dynamodb_secret_access"`
 
-	SnsRegion       string `envconfig:"sns_region"`
-	SnsUrl          string `envconfig:"sns_url"`
-	SnsAccessKey    string `envconfig:"sns_access_key"`
-	SnsTopic        string `envconfig:"sns_topic"`
-	SnsSecretAccess string `envconfig:"sns_secret_access"`
+	SnsRegion              string `envconfig:"sns_region"`
+	SnsUrl                 string `envconfig:"sns_url"`
+	SnsAccessKey           string `envconfig:"sns_access_key"`
+	UpdateOrderStatusTopic string `envconfig:"update_order_status_topic"`
+	SnsSecretAccess        string `envconfig:"sns_secret_access"`
 
 	OrdersURL string `envconfig:"orders_url"`
 }

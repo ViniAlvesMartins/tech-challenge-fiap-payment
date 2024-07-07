@@ -42,7 +42,7 @@ func main() {
 	orderUseCase := use_case.NewOrderUseCase(orderService, logger)
 
 	paymentRepository := repository.NewPaymentRepository(db, logger, loadUUID())
-	snsConnection, err := sns.NewConnection(ctx, cfg.SnsTopic)
+	snsConnection, err := sns.NewConnection(ctx, cfg.UpdateOrderStatusTopic)
 	if err != nil {
 		logger.Error("error connecting to sns", err)
 		panic(err)
@@ -53,13 +53,7 @@ func main() {
 	paymentUseCase := use_case.NewPaymentUseCase(paymentRepository, externalPaymentService, snsService, logger)
 
 	app := http_server.NewApp(logger, paymentUseCase, orderUseCase)
-
-	err = app.Run(ctx)
-
-	if err != nil {
-		logger.Error("error running application", err)
-		panic(err)
-	}
+	app.Run()
 }
 
 func loadUUID() uuid.Interface {

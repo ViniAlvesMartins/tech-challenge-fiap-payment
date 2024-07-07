@@ -97,7 +97,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/payments/{id}/notification-payments": {
+        "/payments/{id}/notification": {
             "post": {
                 "description": "Payment confirmation webhook",
                 "consumes": [

@@ -78,7 +78,7 @@ paths:
       summary: Start payment process
       tags:
       - Payments
-  /payments/{id}/notification-payments:
+  /payments/{id}/notification:
     post:
       consumes:
       - application/json

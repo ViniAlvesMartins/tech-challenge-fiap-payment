@@ -2,10 +2,16 @@ package http_server
 
 import (
 	"context"
+	"errors"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/doc/swagger"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
+	"log"
 	"log/slog"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	_ "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/doc/swagger"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract"
@@ -30,18 +36,39 @@ func NewApp(logger *slog.Logger,
 	}
 }
 
-func (e *App) Run(ctx context.Context) error {
+func (e *App) Run() {
 	router := mux.NewRouter()
 
 	paymentController := controller.NewPaymentController(e.paymentUseCase, e.logger, e.orderUseCase)
 	router.HandleFunc("/payments", paymentController.CreatePayment).Methods("POST")
-	router.HandleFunc("/payments/{paymentId:[0-9]+}/status", paymentController.GetLastPaymentStatus).Methods("GET")
-	router.HandleFunc("/payments/{paymentId:[0-9]+}/notification-payments", paymentController.Notification).Methods("POST")
+	router.HandleFunc("/payments/{id:[0-9]+}/status", paymentController.GetLastPaymentStatus).Methods("GET")
+	router.HandleFunc("/payments/{id:[0-9]+}/notification", paymentController.Notification).Methods("POST")
+	router.PathPrefix("/docs").Handler(httpSwagger.WrapHandler)
 
 	swagger.SwaggerInfo.Title = "Ze Burguer Payment API"
 	swagger.SwaggerInfo.Version = "1.0"
 
-	router.PathPrefix("/docs").Handler(httpSwagger.WrapHandler)
+	server := &http.Server{
+		Addr:    ":8081",
+		Handler: router,
+	}
 
-	return http.ListenAndServe(":8081", router)
+	go func() {
+		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatal(err)
+		}
+		log.Println("stopping server")
+	}()
+
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
+	<-sc
+
+	log.Println("shutting down gracefully")
+	ctxShutdown, cancelShutdown := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancelShutdown()
+
+	if err := server.Shutdown(ctxShutdown); err != nil {
+		log.Fatal(err)
+	}
 }

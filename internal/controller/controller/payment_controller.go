@@ -146,7 +146,7 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 // @Failure      500  {object}  swagger.InternalServerErrorResponse{data=interface{}}
 // @Router       /payments/{id}/status [get]
 func (p *PaymentController) GetLastPaymentStatus(w http.ResponseWriter, r *http.Request) {
-	paymentIdParam := mux.Vars(r)["paymentId"]
+	paymentIdParam := mux.Vars(r)["id"]
 	paymentId, err := strconv.Atoi(paymentIdParam)
 
 	if err != nil {
@@ -200,9 +200,9 @@ func (p *PaymentController) GetLastPaymentStatus(w http.ResponseWriter, r *http.
 // @Success      201  {object}  interface{}
 // @Failure      404  {object}  swagger.ResourceNotFoundResponse{data=interface{}}
 // @Failure      500  {object}  swagger.InternalServerErrorResponse{data=interface{}}
-// @Router       /payments/{id}/notification-payments [post]
+// @Router       /payments/{id}/notification [post]
 func (p *PaymentController) Notification(w http.ResponseWriter, r *http.Request) {
-	paymentIdParam := mux.Vars(r)["paymentId"]
+	paymentIdParam := mux.Vars(r)["id"]
 
 	paymentId, err := strconv.Atoi(paymentIdParam)
 	if err != nil {
