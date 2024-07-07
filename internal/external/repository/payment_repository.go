@@ -37,11 +37,11 @@ func (p *PaymentRepository) Create(ctx context.Context, payment entity.Payment) 
 
 	input := &dynamodb.PutItemInput{
 		Item: map[string]types.AttributeValue{
-			"order_id":      &types.AttributeValueMemberS{Value: payment.OrderID},
+			"order_id":      &types.AttributeValueMemberN{Value: strconv.Itoa(payment.OrderID)},
+			"amount":        &types.AttributeValueMemberN{Value: fmt.Sprint(payment.Amount)},
 			"payment_id":    &types.AttributeValueMemberS{Value: id},
 			"type":          &types.AttributeValueMemberS{Value: string(payment.Type)},
 			"current_state": &types.AttributeValueMemberS{Value: string(payment.CurrentState)},
-			"amount":        &types.AttributeValueMemberN{Value: fmt.Sprint(payment.Amount)},
 		},
 		TableName: aws.String(table),
 	}
@@ -60,7 +60,7 @@ func (p *PaymentRepository) GetLastPaymentStatus(ctx context.Context, orderId in
 	out, err := p.db.GetItem(ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(table),
 		Key: map[string]types.AttributeValue{
-			"order_id": &types.AttributeValueMemberS{Value: strconv.Itoa(orderId)},
+			"order_id": &types.AttributeValueMemberN{Value: strconv.Itoa(orderId)},
 		},
 	})
 
@@ -79,7 +79,7 @@ func (p *PaymentRepository) UpdateStatus(ctx context.Context, orderId int, statu
 	if _, err := p.db.UpdateItem(ctx, &dynamodb.UpdateItemInput{
 		TableName: aws.String(table),
 		Key: map[string]types.AttributeValue{
-			"order_id": &types.AttributeValueMemberS{Value: strconv.Itoa(orderId)},
+			"order_id": &types.AttributeValueMemberN{Value: strconv.Itoa(orderId)},
 		},
 		UpdateExpression: aws.String("set current_state = :current_state"),
 		ExpressionAttributeValues: map[string]types.AttributeValue{

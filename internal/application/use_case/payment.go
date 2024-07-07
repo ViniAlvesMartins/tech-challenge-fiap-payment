@@ -4,14 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	"log/slog"
-	"strconv"
-
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract"
 	responsepaymentservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/payment_service"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
+	"log/slog"
 )
 
 type PaymentUseCase struct {
@@ -68,7 +66,7 @@ func (p *PaymentUseCase) CreateQRCode(ctx context.Context, order *entity.Order) 
 	}
 
 	payment := &entity.Payment{
-		OrderID:      strconv.Itoa(order.ID),
+		OrderID:      order.ID,
 		Type:         enum.QRCODE,
 		CurrentState: enum.PENDING,
 		Amount:       order.Amount,
