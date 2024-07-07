@@ -29,11 +29,7 @@ func NewPaymentUseCase(r contract.PaymentRepository, e contract.ExternalPaymentS
 }
 
 func (p *PaymentUseCase) Create(ctx context.Context, payment *entity.Payment) error {
-	if _, err := p.repository.Create(ctx, *payment); err != nil {
-		return err
-	}
-
-	return nil
+	return p.repository.Create(ctx, *payment)
 }
 
 func (p *PaymentUseCase) GetLastPaymentStatus(ctx context.Context, paymentId int) (enum.PaymentStatus, error) {

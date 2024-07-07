@@ -12,11 +12,11 @@ type PaymentMessage struct {
 }
 
 type Payment struct {
-	PaymentID    string             `json:"payment_id"`
-	OrderID      int                `json:"order_id"`
-	Type         enum.PaymentType   `json:"type"`
-	CurrentState enum.PaymentStatus `json:"status"`
-	Amount       float32            `json:"amount"`
+	PaymentID    string             `json:"payment_id" dynamodbav:"payment_id"`
+	OrderID      int                `json:"order_id" dynamodbav:"order_id"`
+	Type         enum.PaymentType   `json:"type" dynamodbav:"type"`
+	CurrentState enum.PaymentStatus `json:"status" dynamodbav:"status"`
+	Amount       float32            `json:"amount" dynamodbav:"amount"`
 	CreatedAt    *time.Time         `json:"created_at,omitempty"`
 	UpdatedAt    *time.Time         `json:"updated_at,omitempty"`
 	DeletedAt    *time.Time         `json:"deleted_at,omitempty"`

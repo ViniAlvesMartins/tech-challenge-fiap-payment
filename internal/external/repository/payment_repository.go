@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
@@ -11,7 +10,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/aws/aws-sdk-go/aws"
-
 	"log/slog"
 	"strconv"
 )
@@ -32,30 +30,29 @@ func NewPaymentRepository(db contract.DynamoDB, log *slog.Logger, u uuid.Interfa
 	}
 }
 
-func (p *PaymentRepository) Create(ctx context.Context, payment entity.Payment) (*entity.Payment, error) {
-	id := p.uuid.NewString()
+func (p *PaymentRepository) Create(ctx context.Context, payment entity.Payment) error {
+	payment.PaymentID = p.uuid.NewString()
 
+	i, err := attributevalue.Marshal(payment)
+	if err != nil {
+		return err
+	}
+
+	items := i.(*types.AttributeValueMemberM).Value
 	input := &dynamodb.PutItemInput{
-		Item: map[string]types.AttributeValue{
-			"order_id":      &types.AttributeValueMemberN{Value: strconv.Itoa(payment.OrderID)},
-			"amount":        &types.AttributeValueMemberN{Value: fmt.Sprint(payment.Amount)},
-			"payment_id":    &types.AttributeValueMemberS{Value: id},
-			"type":          &types.AttributeValueMemberS{Value: string(payment.Type)},
-			"current_state": &types.AttributeValueMemberS{Value: string(payment.CurrentState)},
-		},
+		Item:      items,
 		TableName: aws.String(table),
 	}
 
-	if _, err := p.db.PutItem(ctx, input); err != nil {
-		return nil, err
+	if _, err = p.db.PutItem(ctx, input); err != nil {
+		return err
 	}
 
-	payment.PaymentID = id
-	return &payment, nil
+	return nil
 }
 
 func (p *PaymentRepository) GetLastPaymentStatus(ctx context.Context, orderId int) (*entity.Payment, error) {
-	payment := &entity.Payment{}
+	var payment *entity.Payment
 
 	out, err := p.db.GetItem(ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(table),

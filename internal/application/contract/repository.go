@@ -9,7 +9,7 @@ import (
 )
 
 type PaymentRepository interface {
-	Create(ctx context.Context, payment entity.Payment) (*entity.Payment, error)
+	Create(ctx context.Context, payment entity.Payment) error
 	GetLastPaymentStatus(ctx context.Context, orderId int) (*entity.Payment, error)
 	UpdateStatus(ctx context.Context, orderId int, status enum.PaymentStatus) error
 }
