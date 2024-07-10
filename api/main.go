@@ -6,7 +6,7 @@ import (
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/config"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/handler/http_server"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/repository"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/external_payment"
+	mercadopago "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/external_payment/mercado_pago"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/order"
 	snsproducer "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/sns"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/pkg/sns"
@@ -49,8 +49,8 @@ func main() {
 	}
 
 	snsService := snsproducer.NewService(snsConnection)
-	externalPaymentService := external_payment.NewService()
-	paymentUseCase := use_case.NewPaymentUseCase(paymentRepository, externalPaymentService, snsService, logger)
+	qrCodePaymentMethod := use_case.NewQRCode(mercadopago.NewPaymentGateway())
+	paymentUseCase := use_case.NewPaymentUseCase(paymentRepository, qrCodePaymentMethod, snsService, logger)
 
 	app := http_server.NewApp(logger, paymentUseCase, orderUseCase)
 	app.Run()

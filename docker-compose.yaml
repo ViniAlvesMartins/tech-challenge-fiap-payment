@@ -1,11 +1,14 @@
 version: '3.9'
 
+include:
+  - "docker-compose-network.yaml"
+
 services:
   dev-app-payment:
     container_name: app.ze-burger-payments.dev
     env_file: .env
     build:
-      dockerfile: ./infra/docker/local/Dockerfile
+      dockerfile: ./infra/docker/Dockerfile
       context: ./
     volumes:
       - .:/app
@@ -13,7 +16,3 @@ services:
       - 8081:8081
     networks:
       - dev-networks
-
-networks:
-  dev-networks:
-    driver: bridge

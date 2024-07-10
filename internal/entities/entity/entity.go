@@ -2,13 +2,17 @@ package entity
 
 import (
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
-	"github.com/google/uuid"
 	"time"
 )
 
 type PaymentMessage struct {
 	OrderId int                `json:"order_id"`
 	Status  enum.PaymentStatus `json:"status"`
+}
+
+type QRCodePayment struct {
+	QRCode  string `json:"qr_code"`
+	OrderID int    `json:"-"`
 }
 
 type Payment struct {
@@ -20,13 +24,6 @@ type Payment struct {
 	CreatedAt    *time.Time         `json:"created_at,omitempty"`
 	UpdatedAt    *time.Time         `json:"updated_at,omitempty"`
 	DeletedAt    *time.Time         `json:"deleted_at,omitempty"`
-}
-
-type ExternalPayment struct {
-	ID      *uuid.UUID       `json:"id"`
-	OrderID int              `json:"-"`
-	Type    enum.PaymentType `json:"type"`
-	Amount  float32          `json:"amount"`
 }
 
 type Order struct {

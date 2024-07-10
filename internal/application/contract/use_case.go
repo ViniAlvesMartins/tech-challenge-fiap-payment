@@ -3,18 +3,20 @@ package contract
 
 import (
 	"context"
-	response_payment_service "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/payment_service"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
 )
+
+type PaymentInterface[T interface{}] interface {
+	Process(p entity.Payment) (*T, error)
+}
 
 type OrderUseCase interface {
 	GetById(id int) (*entity.Order, error)
 }
 
 type PaymentUseCase interface {
-	Create(ctx context.Context, payment *entity.Payment) error
-	CreateQRCode(ctx context.Context, order *entity.Order) (*response_payment_service.CreateQRCode, error)
+	CreateQRCode(ctx context.Context, order *entity.Order) (*entity.QRCodePayment, error)
 	GetLastPaymentStatus(ctx context.Context, paymentId int) (enum.PaymentStatus, error)
 	PaymentNotification(ctx context.Context, paymentId int) error
 }

@@ -1,5 +1,8 @@
 version: '3.9'
 
+include:
+  - "docker-compose-network.yaml"
+
 services:
   payment-localstack:
     image: localstack/localstack:latest
@@ -27,6 +30,3 @@ services:
     networks:
       - dev-networks
 
-networks:
-  dev-networks:
-    driver: bridge

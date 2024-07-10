@@ -4,13 +4,8 @@ package contract
 import (
 	"context"
 	responseorderservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/order_service"
-	responsepaymentservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/payment_service"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 )
-
-type ExternalPaymentService interface {
-	CreateQRCode(payment entity.Payment) (responsepaymentservice.CreateQRCode, error)
-}
 
 type OrderService interface {
 	GetById(id int) (*responseorderservice.GetByIdResp, error)

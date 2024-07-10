@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract"
-	responsepaymentservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/payment_service"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
@@ -13,22 +12,22 @@ import (
 )
 
 type PaymentUseCase struct {
-	repository             contract.PaymentRepository
-	externalPaymentService contract.ExternalPaymentService
-	snsService             contract.SnsService
-	logger                 *slog.Logger
+	repository contract.PaymentRepository
+	qrCode     contract.PaymentInterface[entity.QRCodePayment]
+	snsService contract.SnsService
+	logger     *slog.Logger
 }
 
-func NewPaymentUseCase(r contract.PaymentRepository, e contract.ExternalPaymentService, s contract.SnsService, logger *slog.Logger) *PaymentUseCase {
+func NewPaymentUseCase(r contract.PaymentRepository, q contract.PaymentInterface[entity.QRCodePayment], s contract.SnsService, logger *slog.Logger) *PaymentUseCase {
 	return &PaymentUseCase{
-		repository:             r,
-		externalPaymentService: e,
-		snsService:             s,
-		logger:                 logger,
+		repository: r,
+		qrCode:     q,
+		snsService: s,
+		logger:     logger,
 	}
 }
 
-func (p *PaymentUseCase) Create(ctx context.Context, payment *entity.Payment) error {
+func (p *PaymentUseCase) create(ctx context.Context, payment *entity.Payment) error {
 	return p.repository.Create(ctx, *payment)
 }
 
@@ -40,6 +39,7 @@ func (p *PaymentUseCase) GetLastPaymentStatus(ctx context.Context, paymentId int
 		if errors.As(err, &notFoundErr) {
 			return enum.PENDING, nil
 		}
+
 		return enum.PENDING, err
 	}
 
@@ -50,7 +50,7 @@ func (p *PaymentUseCase) GetLastPaymentStatus(ctx context.Context, paymentId int
 	return payment.CurrentState, nil
 }
 
-func (p *PaymentUseCase) CreateQRCode(ctx context.Context, order *entity.Order) (*responsepaymentservice.CreateQRCode, error) {
+func (p *PaymentUseCase) CreateQRCode(ctx context.Context, order *entity.Order) (*entity.QRCodePayment, error) {
 	lastPaymentStatus, err := p.GetLastPaymentStatus(ctx, order.ID)
 	if err != nil {
 		return nil, err
@@ -61,22 +61,24 @@ func (p *PaymentUseCase) CreateQRCode(ctx context.Context, order *entity.Order) 
 		return nil, nil
 	}
 
-	payment := &entity.Payment{
+	payment := entity.Payment{
 		OrderID:      order.ID,
 		Type:         enum.QRCODE,
 		CurrentState: enum.PENDING,
 		Amount:       order.Amount,
 	}
 
-	p.Create(ctx, payment)
+	p.create(ctx, &payment)
 
-	qrCode, _ := p.externalPaymentService.CreateQRCode(*payment)
+	qrCode, err := p.qrCode.Process(payment)
+	if err != nil {
+		return nil, err
+	}
 
-	return &qrCode, nil
+	return qrCode, nil
 }
 
 func (p *PaymentUseCase) PaymentNotification(ctx context.Context, paymentId int) error {
-	// implement db transaction for SAGA
 	if err := p.repository.UpdateStatus(ctx, paymentId, enum.CONFIRMED); err != nil {
 		return err
 	}
@@ -92,3 +94,17 @@ func (p *PaymentUseCase) PaymentNotification(ctx context.Context, paymentId int)
 
 	return nil
 }
+
+//func (p *PaymentUseCase) CancelPayment(ctx context.Context, orderId int) error {
+//	err := p.repository.UpdateStatus(ctx, paymentId, enum.CONFIRMED); err != nil {
+//		return err
+//	}
+//
+//
+//
+//	if err := p.snsService.SendMessage(ctx, payment); err != nil {
+//		return err
+//	}
+//
+//	return nil
+//}
