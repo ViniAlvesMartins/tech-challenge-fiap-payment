@@ -242,11 +242,11 @@ const docTemplate = `{
         "input.PaymentDto": {
             "type": "object",
             "required": [
-                "orderId",
+                "order_id",
                 "type"
             ],
             "properties": {
-                "orderId": {
+                "order_id": {
                     "type": "integer"
                 },
                 "type": {

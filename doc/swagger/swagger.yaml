@@ -8,12 +8,12 @@ definitions:
     type: object
   input.PaymentDto:
     properties:
-      orderId:
+      order_id:
         type: integer
       type:
         type: string
     required:
-    - orderId
+    - order_id
     - type
     type: object
   swagger.InternalServerErrorResponse:
