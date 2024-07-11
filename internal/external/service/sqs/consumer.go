@@ -8,10 +8,10 @@ import (
 )
 
 type Handler interface {
-	Handle(a any) error
+	Handle(b []byte) error
 }
 
-type Consumer[T interface{}] struct {
+type Consumer struct {
 	service *sqs.Service
 	handler Handler
 }
@@ -24,11 +24,14 @@ type MessageBody struct {
 	Timestamp string
 }
 
-func NewConsumer(s *sqs.Service) *Consumer[interface{}] {
-	return &Consumer[interface{}]{service: s}
+func NewConsumer(s *sqs.Service, h Handler) *Consumer {
+	return &Consumer{
+		service: s,
+		handler: h,
+	}
 }
 
-func (c *Consumer[T]) Start(ctx context.Context) error {
+func (c *Consumer) Start(ctx context.Context) error {
 	for {
 		m, err := c.service.ReceiveMessage(ctx)
 		if err != nil {
@@ -46,13 +49,7 @@ func (c *Consumer[T]) Start(ctx context.Context) error {
 			continue
 		}
 
-		var message T
-		if err = json.Unmarshal([]byte(body.Message), &message); err != nil {
-			log.Println(err.Error())
-			continue
-		}
-
-		if err = c.handler.Handle(message); err != nil {
+		if err = c.handler.Handle([]byte(body.Message)); err != nil {
 			log.Println(err.Error())
 			continue
 		}

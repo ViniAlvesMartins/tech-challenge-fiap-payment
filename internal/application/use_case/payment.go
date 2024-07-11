@@ -78,13 +78,13 @@ func (p *PaymentUseCase) CreateQRCode(ctx context.Context, order *entity.Order) 
 	return qrCode, nil
 }
 
-func (p *PaymentUseCase) PaymentNotification(ctx context.Context, paymentId int) error {
-	if err := p.repository.UpdateStatus(ctx, paymentId, enum.CONFIRMED); err != nil {
+func (p *PaymentUseCase) ConfirmedPaymentNotification(ctx context.Context, id int) error {
+	if err := p.repository.UpdateStatus(ctx, id, enum.CONFIRMED); err != nil {
 		return err
 	}
 
 	payment := entity.PaymentMessage{
-		OrderId: paymentId,
+		OrderId: id,
 		Status:  enum.CONFIRMED,
 	}
 
@@ -95,16 +95,19 @@ func (p *PaymentUseCase) PaymentNotification(ctx context.Context, paymentId int)
 	return nil
 }
 
-//func (p *PaymentUseCase) CancelPayment(ctx context.Context, orderId int) error {
-//	err := p.repository.UpdateStatus(ctx, paymentId, enum.CONFIRMED); err != nil {
-//		return err
-//	}
-//
-//
-//
-//	if err := p.snsService.SendMessage(ctx, payment); err != nil {
-//		return err
-//	}
-//
-//	return nil
-//}
+func (p *PaymentUseCase) CanceledPaymentNotification(ctx context.Context, id int) error {
+	if err := p.repository.UpdateStatus(ctx, id, enum.CANCELED); err != nil {
+		return err
+	}
+
+	payment := entity.PaymentMessage{
+		OrderId: id,
+		Status:  enum.CANCELED,
+	}
+
+	if err := p.snsService.SendMessage(ctx, payment); err != nil {
+		return err
+	}
+
+	return nil
+}

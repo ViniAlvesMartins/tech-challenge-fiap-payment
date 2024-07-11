@@ -17,6 +17,7 @@ type OrderUseCase interface {
 
 type PaymentUseCase interface {
 	CreateQRCode(ctx context.Context, order *entity.Order) (*entity.QRCodePayment, error)
-	GetLastPaymentStatus(ctx context.Context, paymentId int) (enum.PaymentStatus, error)
-	PaymentNotification(ctx context.Context, paymentId int) error
+	GetLastPaymentStatus(ctx context.Context, id int) (enum.PaymentStatus, error)
+	ConfirmedPaymentNotification(ctx context.Context, id int) error
+	CanceledPaymentNotification(ctx context.Context, id int) error
 }

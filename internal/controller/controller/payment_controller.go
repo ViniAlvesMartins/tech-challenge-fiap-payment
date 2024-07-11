@@ -218,7 +218,7 @@ func (p *PaymentController) Notification(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if err = p.paymentUseCase.PaymentNotification(r.Context(), paymentId); err != nil {
+	if err = p.paymentUseCase.ConfirmedPaymentNotification(r.Context(), paymentId); err != nil {
 		p.logger.Error("error processing payment notification", slog.Any("error", err.Error()))
 
 		w.WriteHeader(http.StatusInternalServerError)
