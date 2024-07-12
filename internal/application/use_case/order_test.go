@@ -3,8 +3,8 @@ package use_case
 import (
 	"errors"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract/mock"
-	responseorderservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/order_service"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
+	orderservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/order"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"log/slog"
@@ -27,7 +27,7 @@ func TestOrderUseCase_GetById(t *testing.T) {
 			CreatedAt:   time.Now(),
 		}
 
-		orderServiceResponse := &responseorderservice.GetByIdResp{
+		orderServiceResponse := &orderservice.GetByIdResp{
 			Error: "",
 			Data:  order,
 		}
@@ -47,7 +47,7 @@ func TestOrderUseCase_GetById(t *testing.T) {
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 		expectedError := errors.New("error getting order by id")
 
-		orderServiceResponse := &responseorderservice.GetByIdResp{
+		orderServiceResponse := &orderservice.GetByIdResp{
 			Error: expectedError.Error(),
 			Data:  nil,
 		}

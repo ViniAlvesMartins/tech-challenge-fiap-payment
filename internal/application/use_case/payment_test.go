@@ -5,70 +5,15 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract/mock"
-	responsepaymentservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/payment_service"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/external_payment/mercado_pago"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"log/slog"
 	"os"
-	"strconv"
 	"testing"
 )
-
-func TestPaymentUseCase_Create(t *testing.T) {
-	t.Run("create payment successfully", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
-		ctx := context.Background()
-
-		payment := entity.Payment{
-			OrderID:      "1",
-			Type:         enum.QRCODE,
-			CurrentState: enum.PENDING,
-			Amount:       123.45,
-		}
-
-		result := payment
-		result.PaymentID = "65cf595b-19b9-431b-9a81-9818dec845ff"
-
-		externalPaymentMock := mock.NewMockExternalPaymentService(ctrl)
-
-		repo := mock.NewMockPaymentRepository(ctrl)
-		repo.EXPECT().Create(ctx, payment).Times(1).Return(&result, nil)
-		sns := mock.NewMockSnsService(ctrl)
-
-		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
-		err := paymentUseCase.Create(ctx, &payment)
-
-		assert.Nil(t, err)
-	})
-
-	t.Run("error creating payment", func(t *testing.T) {
-		ctx := context.Background()
-		ctrl := gomock.NewController(t)
-		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
-		expectedErr := errors.New("error connecting to database")
-
-		payment := entity.Payment{
-			OrderID:      "1",
-			Type:         enum.QRCODE,
-			CurrentState: enum.PENDING,
-			Amount:       123.45,
-		}
-
-		externalPaymentMock := mock.NewMockExternalPaymentService(ctrl)
-
-		repo := mock.NewMockPaymentRepository(ctrl)
-		repo.EXPECT().Create(ctx, payment).Times(1).Return(nil, expectedErr)
-		sns := mock.NewMockSnsService(ctrl)
-
-		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
-		err := paymentUseCase.Create(ctx, &payment)
-
-		assert.Error(t, expectedErr, err)
-	})
-}
 
 func TestPaymentUseCase_GetLastPaymentStatus(t *testing.T) {
 	for _, tt := range lastPaymentStatusPayments() {
@@ -77,7 +22,7 @@ func TestPaymentUseCase_GetLastPaymentStatus(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 
-			externalPaymentMock := mock.NewMockExternalPaymentService(ctrl)
+			externalPaymentMock := mock.NewMockPaymentInterface(ctrl)
 
 			sns := mock.NewMockSnsService(ctrl)
 			repo := mock.NewMockPaymentRepository(ctrl)
@@ -99,13 +44,13 @@ func TestPaymentUseCase_GetLastPaymentStatus(t *testing.T) {
 
 		payment := &entity.Payment{
 			PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
-			OrderID:      "1",
+			OrderID:      1,
 			Type:         enum.QRCODE,
 			CurrentState: enum.PENDING,
 			Amount:       132.45,
 		}
 
-		externalPaymentMock := mock.NewMockExternalPaymentService(ctrl)
+		externalPaymentMock := mock.NewMockPaymentInterface(ctrl)
 
 		sns := mock.NewMockSnsService(ctrl)
 		repo := mock.NewMockPaymentRepository(ctrl)
@@ -140,13 +85,13 @@ func TestPaymentUseCase_CreateQRCode(t *testing.T) {
 
 		payment := &entity.Payment{
 			PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
-			OrderID:      strconv.Itoa(order.ID),
+			OrderID:      order.ID,
 			Type:         enum.QRCODE,
 			CurrentState: enum.PENDING,
 			Amount:       order.Amount,
 		}
 
-		qrCode := responsepaymentservice.CreateQRCode{QrData: "qr data"}
+		qrCode := mercado_pago.Response{QRData: "qr data"}
 
 		sns := mock.NewMockSnsService(ctrl)
 
@@ -154,13 +99,13 @@ func TestPaymentUseCase_CreateQRCode(t *testing.T) {
 		getLastPaymentStatus := repo.EXPECT().GetLastPaymentStatus(ctx, 1).Times(1).Return(payment, nil)
 		createPayment := repo.EXPECT().Create(ctx, gomock.Any()).Times(1).Return(payment, nil).After(getLastPaymentStatus)
 
-		externalPaymentMock := mock.NewMockExternalPaymentService(ctrl)
-		externalPaymentMock.EXPECT().CreateQRCode(gomock.Any()).Times(1).Return(qrCode, nil).After(createPayment)
+		externalPaymentMock := mock.NewMockPaymentInterface(ctrl)
+		externalPaymentMock.EXPECT().Process(gomock.Any()).Times(1).Return(qrCode, nil).After(createPayment)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 		code, err := paymentUseCase.CreateQRCode(ctx, order)
 
-		assert.Equal(t, code.QrData, qrCode.QrData)
+		assert.Equal(t, code.QRCode, qrCode.QRData)
 		assert.Nil(t, err)
 	})
 
@@ -178,14 +123,14 @@ func TestPaymentUseCase_CreateQRCode(t *testing.T) {
 
 		payment := &entity.Payment{
 			PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
-			OrderID:      strconv.Itoa(order.ID),
+			OrderID:      order.ID,
 			Type:         enum.QRCODE,
 			CurrentState: enum.CONFIRMED,
 			Amount:       order.Amount,
 		}
 
 		sns := mock.NewMockSnsService(ctrl)
-		externalPaymentMock := mock.NewMockExternalPaymentService(ctrl)
+		externalPaymentMock := mock.NewMockPaymentInterface(ctrl)
 
 		repo := mock.NewMockPaymentRepository(ctrl)
 		repo.EXPECT().GetLastPaymentStatus(ctx, 1).Times(1).Return(payment, nil)
@@ -211,7 +156,7 @@ func TestPaymentUseCase_CreateQRCode(t *testing.T) {
 		}
 
 		sns := mock.NewMockSnsService(ctrl)
-		externalPaymentMock := mock.NewMockExternalPaymentService(ctrl)
+		externalPaymentMock := mock.NewMockPaymentInterface(ctrl)
 
 		repo := mock.NewMockPaymentRepository(ctrl)
 		repo.EXPECT().GetLastPaymentStatus(ctx, 1).Times(1).Return(nil, expectedErr)
@@ -230,7 +175,7 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 
-		externalPaymentMock := mock.NewMockExternalPaymentService(ctrl)
+		externalPaymentMock := mock.NewMockPaymentInterface(ctrl)
 		repo := mock.NewMockPaymentRepository(ctrl)
 		updateStatus := repo.EXPECT().UpdateStatus(ctx, 1, enum.CONFIRMED).Times(1).Return(nil)
 
@@ -238,7 +183,7 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 		sns.EXPECT().SendMessage(1, enum.CONFIRMED).Times(1).Return(nil).After(updateStatus)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
-		err := paymentUseCase.PaymentNotification(ctx, 1)
+		err := paymentUseCase.ConfirmedPaymentNotification(ctx, 1)
 
 		assert.Nil(t, err)
 	})
@@ -250,13 +195,13 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 		expectedErr := errors.New("error updating status")
 
 		sns := mock.NewMockSnsService(ctrl)
-		externalPaymentMock := mock.NewMockExternalPaymentService(ctrl)
+		externalPaymentMock := mock.NewMockPaymentInterface(ctrl)
 
 		repo := mock.NewMockPaymentRepository(ctrl)
 		repo.EXPECT().UpdateStatus(ctx, 1, enum.CONFIRMED).Times(1).Return(expectedErr)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
-		err := paymentUseCase.PaymentNotification(ctx, 1)
+		err := paymentUseCase.ConfirmedPaymentNotification(ctx, 1)
 
 		assert.Error(t, expectedErr, err)
 	})
@@ -267,7 +212,7 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 		expectedErr := errors.New("error sending message")
 
-		externalPaymentMock := mock.NewMockExternalPaymentService(ctrl)
+		externalPaymentMock := mock.NewMockPaymentInterface(ctrl)
 		repo := mock.NewMockPaymentRepository(ctrl)
 		updateStatus := repo.EXPECT().UpdateStatus(ctx, 1, enum.CONFIRMED).Times(1).Return(nil)
 
@@ -275,7 +220,7 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 		sns.EXPECT().SendMessage(1, enum.CONFIRMED).Times(1).Return(expectedErr).After(updateStatus)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
-		err := paymentUseCase.PaymentNotification(ctx, 1)
+		err := paymentUseCase.ConfirmedPaymentNotification(ctx, 1)
 
 		assert.Error(t, expectedErr, err)
 	})
@@ -286,7 +231,7 @@ func lastPaymentStatusPayments() []paymentTest {
 		{
 			Payment: &entity.Payment{
 				PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
-				OrderID:      "1",
+				OrderID:      1,
 				Type:         enum.QRCODE,
 				CurrentState: enum.PENDING,
 				Amount:       132.45,
@@ -297,7 +242,7 @@ func lastPaymentStatusPayments() []paymentTest {
 		{
 			Payment: &entity.Payment{
 				PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f1",
-				OrderID:      "1",
+				OrderID:      1,
 				Type:         enum.QRCODE,
 				CurrentState: "",
 				Amount:       132.45,

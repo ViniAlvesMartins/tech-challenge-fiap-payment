@@ -23,3 +23,8 @@ echo $(aws --endpoint-url=http://localhost:4566 sqs create-queue --queue-name pr
 # -- > List  SQS Queues
 echo Listing queues ...
 echo $(aws --endpoint-url=http://localhost:4566 sqs list-queues --profile test-profile --region us-east-1 --output table | cat)
+
+
+
+#aws --endpoint-url=http://localhost:4566 sqs send-message --queue-url http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/production-failed-queue --profile test-profile --region us-east-1 --message-body "{\"order_id\": 1}" --delay-seconds 10 --message-attributes file://send-message.json --output table | cat
+

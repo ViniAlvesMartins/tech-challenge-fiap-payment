@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract/mock"
-	responsepaymentservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/payment_service"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/controller/serializer/input"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/external_payment/mercado_pago"
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
@@ -32,7 +32,7 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 			CreatedAt:   time.Now(),
 		}
 
-		qrCode := &responsepaymentservice.CreateQRCode{QrData: "qr_data"}
+		qrCode := &mercado_pago.Response{QRData: "qr_data"}
 		body := input.PaymentDto{OrderId: order.ID, Type: string(enum.QRCODE)}
 		jsonBody, _ := json.Marshal(body)
 		bodyReader := bytes.NewReader(jsonBody)
@@ -324,7 +324,7 @@ func TestPaymentController_Notification(t *testing.T) {
 		orderUseCaseMock := mock.NewMockOrderUseCase(ctrl)
 
 		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
-		paymentUseCaseMock.EXPECT().PaymentNotification(r.Context(), 1).Return(nil)
+		paymentUseCaseMock.EXPECT().ConfirmedPaymentNotification(r.Context(), 1).Return(nil)
 
 		c := NewPaymentController(paymentUseCaseMock, loggerMock, orderUseCaseMock)
 		c.Notification(w, r)

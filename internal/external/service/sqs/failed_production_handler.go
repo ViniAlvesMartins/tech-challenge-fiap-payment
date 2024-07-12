@@ -2,6 +2,7 @@ package sqs
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract"
 )
 
@@ -22,6 +23,8 @@ func (f *FailedProductHandler) Handle(b []byte) error {
 	if err := json.Unmarshal(b, &message); err != nil {
 		return err
 	}
+
+	fmt.Println(message.OrderId)
 
 	return nil
 }

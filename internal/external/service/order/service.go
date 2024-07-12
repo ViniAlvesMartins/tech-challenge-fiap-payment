@@ -3,7 +3,7 @@ package order
 import (
 	"errors"
 	"fmt"
-	responseorderservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/order_service"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 	"github.com/go-resty/resty/v2"
 	"log/slog"
 )
@@ -13,12 +13,17 @@ type Service struct {
 	logger *slog.Logger
 }
 
+type GetByIdResp struct {
+	Error string        `json:"error"`
+	Data  *entity.Order `json:"data"`
+}
+
 func NewService(c *resty.Client, l *slog.Logger) *Service {
 	return &Service{logger: l, client: c}
 }
 
-func (o *Service) GetById(id int) (*responseorderservice.GetByIdResp, error) {
-	var order responseorderservice.GetByIdResp
+func (o *Service) GetById(id int) (*GetByIdResp, error) {
+	var order GetByIdResp
 
 	resp, err := o.client.R().
 		SetHeader("Accept", "application/json").

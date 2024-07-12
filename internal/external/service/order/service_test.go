@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/config"
 
-	responseorderservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/order_service"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
 	"github.com/go-resty/resty/v2"
@@ -24,7 +23,7 @@ func TestOrderService_GetById(t *testing.T) {
 		client := resty.New().SetBaseURL(config.OrdersURL)
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 
-		response := responseorderservice.GetByIdResp{
+		response := GetByIdResp{
 			Error: "",
 			Data: &entity.Order{
 				ID:          1,
@@ -41,7 +40,7 @@ func TestOrderService_GetById(t *testing.T) {
 		httpmock.RegisterResponder("GET", fmt.Sprintf("%s%s", config.OrdersURL, "/orders/1"),
 			httpmock.NewJsonResponderOrPanic(200, response))
 
-		orderService := NewOrderService(client, logger)
+		orderService := NewService(client, logger)
 		order, err := orderService.GetById(1)
 
 		expectedJsonResponse, _ := json.Marshal(response)
@@ -57,7 +56,7 @@ func TestOrderService_GetById(t *testing.T) {
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 		expectedErr := errors.New("Get \"orders\": no responder found")
 
-		response := responseorderservice.GetByIdResp{
+		response := GetByIdResp{
 			Error: "",
 			Data: &entity.Order{
 				ID:          1,
@@ -74,7 +73,7 @@ func TestOrderService_GetById(t *testing.T) {
 		httpmock.RegisterResponder("GET", fmt.Sprintf("%s%s", config.OrdersURL, "/teste./1"),
 			httpmock.NewJsonResponderOrPanic(200, response))
 
-		orderService := NewOrderService(client, logger)
+		orderService := NewService(client, logger)
 		order, err := orderService.GetById(1)
 
 		assert.Errorf(t, expectedErr, err.Error())
@@ -87,7 +86,7 @@ func TestOrderService_GetById(t *testing.T) {
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 		expectedErr := errors.New("request response error")
 
-		response := responseorderservice.GetByIdResp{
+		response := GetByIdResp{
 			Error: "Internal server error",
 			Data:  nil,
 		}
@@ -98,7 +97,7 @@ func TestOrderService_GetById(t *testing.T) {
 		httpmock.RegisterResponder("GET", fmt.Sprintf("%s%s", config.OrdersURL, "/orders/1"),
 			httpmock.NewJsonResponderOrPanic(500, response))
 
-		orderService := NewOrderService(client, logger)
+		orderService := NewService(client, logger)
 		order, err := orderService.GetById(1)
 
 		assert.Errorf(t, expectedErr, err.Error())

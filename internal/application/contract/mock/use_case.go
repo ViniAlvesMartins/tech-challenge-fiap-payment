@@ -8,11 +8,49 @@ import (
 	context "context"
 	reflect "reflect"
 
-	response_payment_service "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/payment_service"
+	contract "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract"
 	entity "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 	enum "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
 	gomock "github.com/golang/mock/gomock"
 )
+
+// MockPaymentInterface is a mock of PaymentInterface interface.
+type MockPaymentInterface struct {
+	ctrl     *gomock.Controller
+	recorder *MockPaymentInterfaceMockRecorder
+}
+
+// MockPaymentInterfaceMockRecorder is the mock recorder for MockPaymentInterface.
+type MockPaymentInterfaceMockRecorder struct {
+	mock *MockPaymentInterface
+}
+
+// NewMockPaymentInterface creates a new mock instance.
+func NewMockPaymentInterface(ctrl *gomock.Controller) *MockPaymentInterface {
+	mock := &MockPaymentInterface{ctrl: ctrl}
+	mock.recorder = &MockPaymentInterfaceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockPaymentInterface) EXPECT() *MockPaymentInterfaceMockRecorder {
+	return m.recorder
+}
+
+// Process mocks base method.
+func (m *MockPaymentInterface) Process(p entity.Payment) (*contract.T, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Process", p)
+	ret0, _ := ret[0].(*contract.T)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Process indicates an expected call of Process.
+func (mr *MockPaymentInterfaceMockRecorder) Process(p interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Process", reflect.TypeOf((*MockPaymentInterface)(nil).Process), p)
+}
 
 // MockOrderUseCase is a mock of OrderUseCase interface.
 type MockOrderUseCase struct {
@@ -75,25 +113,39 @@ func (m *MockPaymentUseCase) EXPECT() *MockPaymentUseCaseMockRecorder {
 	return m.recorder
 }
 
-// Create mocks base method.
-func (m *MockPaymentUseCase) Create(ctx context.Context, payment *entity.Payment) error {
+// CanceledPaymentNotification mocks base method.
+func (m *MockPaymentUseCase) CanceledPaymentNotification(ctx context.Context, id int) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, payment)
+	ret := m.ctrl.Call(m, "CanceledPaymentNotification", ctx, id)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Create indicates an expected call of Create.
-func (mr *MockPaymentUseCaseMockRecorder) Create(ctx, payment interface{}) *gomock.Call {
+// CanceledPaymentNotification indicates an expected call of CanceledPaymentNotification.
+func (mr *MockPaymentUseCaseMockRecorder) CanceledPaymentNotification(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockPaymentUseCase)(nil).Create), ctx, payment)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CanceledPaymentNotification", reflect.TypeOf((*MockPaymentUseCase)(nil).CanceledPaymentNotification), ctx, id)
+}
+
+// ConfirmedPaymentNotification mocks base method.
+func (m *MockPaymentUseCase) ConfirmedPaymentNotification(ctx context.Context, id int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ConfirmedPaymentNotification", ctx, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ConfirmedPaymentNotification indicates an expected call of ConfirmedPaymentNotification.
+func (mr *MockPaymentUseCaseMockRecorder) ConfirmedPaymentNotification(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConfirmedPaymentNotification", reflect.TypeOf((*MockPaymentUseCase)(nil).ConfirmedPaymentNotification), ctx, id)
 }
 
 // CreateQRCode mocks base method.
-func (m *MockPaymentUseCase) CreateQRCode(ctx context.Context, order *entity.Order) (*response_payment_service.CreateQRCode, error) {
+func (m *MockPaymentUseCase) CreateQRCode(ctx context.Context, order *entity.Order) (*entity.QRCodePayment, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateQRCode", ctx, order)
-	ret0, _ := ret[0].(*response_payment_service.CreateQRCode)
+	ret0, _ := ret[0].(*entity.QRCodePayment)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -105,30 +157,16 @@ func (mr *MockPaymentUseCaseMockRecorder) CreateQRCode(ctx, order interface{}) *
 }
 
 // GetLastPaymentStatus mocks base method.
-func (m *MockPaymentUseCase) GetLastPaymentStatus(ctx context.Context, paymentId int) (enum.PaymentStatus, error) {
+func (m *MockPaymentUseCase) GetLastPaymentStatus(ctx context.Context, id int) (enum.PaymentStatus, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetLastPaymentStatus", ctx, paymentId)
+	ret := m.ctrl.Call(m, "GetLastPaymentStatus", ctx, id)
 	ret0, _ := ret[0].(enum.PaymentStatus)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetLastPaymentStatus indicates an expected call of GetLastPaymentStatus.
-func (mr *MockPaymentUseCaseMockRecorder) GetLastPaymentStatus(ctx, paymentId interface{}) *gomock.Call {
+func (mr *MockPaymentUseCaseMockRecorder) GetLastPaymentStatus(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLastPaymentStatus", reflect.TypeOf((*MockPaymentUseCase)(nil).GetLastPaymentStatus), ctx, paymentId)
-}
-
-// PaymentNotification mocks base method.
-func (m *MockPaymentUseCase) PaymentNotification(ctx context.Context, paymentId int) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PaymentNotification", ctx, paymentId)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// PaymentNotification indicates an expected call of PaymentNotification.
-func (mr *MockPaymentUseCaseMockRecorder) PaymentNotification(ctx, paymentId interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PaymentNotification", reflect.TypeOf((*MockPaymentUseCase)(nil).PaymentNotification), ctx, paymentId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLastPaymentStatus", reflect.TypeOf((*MockPaymentUseCase)(nil).GetLastPaymentStatus), ctx, id)
 }

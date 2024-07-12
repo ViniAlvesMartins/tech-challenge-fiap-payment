@@ -38,12 +38,11 @@ func (m *MockPaymentRepository) EXPECT() *MockPaymentRepositoryMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockPaymentRepository) Create(ctx context.Context, payment entity.Payment) (*entity.Payment, error) {
+func (m *MockPaymentRepository) Create(ctx context.Context, payment entity.Payment) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, payment)
-	ret0, _ := ret[0].(*entity.Payment)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Create indicates an expected call of Create.

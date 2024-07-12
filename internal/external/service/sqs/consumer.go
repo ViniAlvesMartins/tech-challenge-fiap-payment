@@ -3,6 +3,7 @@ package sqs
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/pkg/sqs"
 	"log"
 )
@@ -42,6 +43,8 @@ func (c *Consumer) Start(ctx context.Context) error {
 		if m == nil {
 			continue
 		}
+
+		fmt.Println(string([]byte(*m.Body)))
 
 		var body *MessageBody
 		if err = json.Unmarshal([]byte(*m.Body), &body); err != nil {

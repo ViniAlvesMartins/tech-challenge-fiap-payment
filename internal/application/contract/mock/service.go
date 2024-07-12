@@ -5,52 +5,13 @@
 package mock
 
 import (
+	context "context"
 	reflect "reflect"
 
-	response_order_service "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/order_service"
-	response_payment_service "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/payment_service"
 	entity "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
-	enum "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
+	order "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/order"
 	gomock "github.com/golang/mock/gomock"
 )
-
-// MockExternalPaymentService is a mock of ExternalPaymentService interface.
-type MockExternalPaymentService struct {
-	ctrl     *gomock.Controller
-	recorder *MockExternalPaymentServiceMockRecorder
-}
-
-// MockExternalPaymentServiceMockRecorder is the mock recorder for MockExternalPaymentService.
-type MockExternalPaymentServiceMockRecorder struct {
-	mock *MockExternalPaymentService
-}
-
-// NewMockExternalPaymentService creates a new mock instance.
-func NewMockExternalPaymentService(ctrl *gomock.Controller) *MockExternalPaymentService {
-	mock := &MockExternalPaymentService{ctrl: ctrl}
-	mock.recorder = &MockExternalPaymentServiceMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockExternalPaymentService) EXPECT() *MockExternalPaymentServiceMockRecorder {
-	return m.recorder
-}
-
-// CreateQRCode mocks base method.
-func (m *MockExternalPaymentService) CreateQRCode(payment entity.Payment) (response_payment_service.CreateQRCode, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateQRCode", payment)
-	ret0, _ := ret[0].(response_payment_service.CreateQRCode)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateQRCode indicates an expected call of CreateQRCode.
-func (mr *MockExternalPaymentServiceMockRecorder) CreateQRCode(payment interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateQRCode", reflect.TypeOf((*MockExternalPaymentService)(nil).CreateQRCode), payment)
-}
 
 // MockOrderService is a mock of OrderService interface.
 type MockOrderService struct {
@@ -76,10 +37,10 @@ func (m *MockOrderService) EXPECT() *MockOrderServiceMockRecorder {
 }
 
 // GetById mocks base method.
-func (m *MockOrderService) GetById(id int) (*response_order_service.GetByIdResp, error) {
+func (m *MockOrderService) GetById(id int) (*order.GetByIdResp, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetById", id)
-	ret0, _ := ret[0].(*response_order_service.GetByIdResp)
+	ret0, _ := ret[0].(*order.GetByIdResp)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -114,15 +75,15 @@ func (m *MockSnsService) EXPECT() *MockSnsServiceMockRecorder {
 }
 
 // SendMessage mocks base method.
-func (m *MockSnsService) SendMessage(paymentId int, status enum.PaymentStatus) error {
+func (m *MockSnsService) SendMessage(ctx context.Context, message entity.PaymentMessage) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SendMessage", paymentId, status)
+	ret := m.ctrl.Call(m, "SendMessage", ctx, message)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // SendMessage indicates an expected call of SendMessage.
-func (mr *MockSnsServiceMockRecorder) SendMessage(paymentId, status interface{}) *gomock.Call {
+func (mr *MockSnsServiceMockRecorder) SendMessage(ctx, message interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMessage", reflect.TypeOf((*MockSnsService)(nil).SendMessage), paymentId, status)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMessage", reflect.TypeOf((*MockSnsService)(nil).SendMessage), ctx, message)
 }

@@ -3,12 +3,12 @@ package contract
 
 import (
 	"context"
-	responseorderservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/modules/response/order_service"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/order"
 )
 
 type OrderService interface {
-	GetById(id int) (*responseorderservice.GetByIdResp, error)
+	GetById(id int) (*order.GetByIdResp, error)
 }
 
 type SnsService interface {

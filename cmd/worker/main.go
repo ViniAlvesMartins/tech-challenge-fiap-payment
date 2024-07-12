@@ -11,6 +11,8 @@ import (
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/pkg/uuid"
 	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -44,6 +46,10 @@ func main() {
 
 	failedProductionConsumer := sqs.NewConsumer(consumer, failedProductionHandler)
 	failedProductionConsumer.Start(ctx)
+
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
+	<-sc
 }
 
 func loadUUID() uuid.Interface {
