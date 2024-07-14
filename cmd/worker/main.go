@@ -17,7 +17,7 @@ import (
 
 func main() {
 	var err error
-	var ctx = context.Background()
+	var ctx, cancel = context.WithCancel(context.Background())
 	var logger = loadLogger()
 
 	cfg, err := loadConfig()
@@ -50,6 +50,7 @@ func main() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
 	<-sc
+	cancel()
 }
 
 func loadUUID() uuid.Interface {

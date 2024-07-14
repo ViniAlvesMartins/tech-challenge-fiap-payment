@@ -12,6 +12,7 @@ RUN go install github.com/swaggo/swag/cmd/swag@latest
 COPY . .
 
 RUN go build -o ./cmd/api/main ./cmd/api/main.go
+RUN go build -o ./cmd/worker/main ./cmd/worker/main.go
 
 EXPOSE 8081
 

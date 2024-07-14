@@ -8,7 +8,7 @@ services:
     container_name: api.ze-burger-payments.dev
     env_file: .env
     build:
-      dockerfile: ./infra/docker/Dockerfile
+      dockerfile: ./infra/docker/local/Dockerfile
       context: ./
     volumes:
       - .:/app
@@ -22,7 +22,7 @@ services:
     command: >
       sh -c "go run cmd/worker/main.go"
     build:
-      dockerfile: ./infra/docker/Dockerfile
+      dockerfile: ./infra/docker/local/Dockerfile
       context: ./
     volumes:
       - .:/app

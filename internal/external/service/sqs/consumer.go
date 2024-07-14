@@ -59,9 +59,9 @@ func (c *Consumer) Start(ctx context.Context) error {
 			continue
 		}
 
-		//select {
-		//case <-ctx.Done():
-		//	break
-		//}
+		select {
+		case <-ctx.Done():
+			break
+		}
 	}
 }
