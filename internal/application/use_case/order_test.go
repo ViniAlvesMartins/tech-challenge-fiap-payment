@@ -5,7 +5,6 @@ import (
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract/mock"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 	orderservice "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/order"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"log/slog"
 	"os"
@@ -15,7 +14,6 @@ import (
 
 func TestOrderUseCase_GetById(t *testing.T) {
 	t.Run("get order by id successfully", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 		clientID := 1
 
@@ -32,8 +30,8 @@ func TestOrderUseCase_GetById(t *testing.T) {
 			Data:  order,
 		}
 
-		orderService := mock.NewMockOrderService(ctrl)
-		orderService.EXPECT().GetById(1).Return(orderServiceResponse, nil).Times(1)
+		orderService := new(mock.OrderService)
+		orderService.On("GetById", 1).Return(orderServiceResponse, nil).Once()
 
 		orderUseCase := NewOrderUseCase(orderService, logger)
 		orders, err := orderUseCase.GetById(1)
@@ -43,7 +41,6 @@ func TestOrderUseCase_GetById(t *testing.T) {
 	})
 
 	t.Run("error getting order by id", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 		expectedError := errors.New("error getting order by id")
 
@@ -52,8 +49,8 @@ func TestOrderUseCase_GetById(t *testing.T) {
 			Data:  nil,
 		}
 
-		orderService := mock.NewMockOrderService(ctrl)
-		orderService.EXPECT().GetById(1).Return(orderServiceResponse, nil).Times(1)
+		orderService := new(mock.OrderService)
+		orderService.On("GetById", 1).Return(orderServiceResponse, nil).Once()
 
 		orderUseCase := NewOrderUseCase(orderService, logger)
 		orders, err := orderUseCase.GetById(1)

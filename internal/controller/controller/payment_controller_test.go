@@ -4,12 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract/mock"
+	contractmock "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract/mock"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/controller/serializer/input"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/external_payment/mercado_pago"
-	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 	"log/slog"
@@ -22,8 +20,6 @@ import (
 
 func TestPaymentController_CreatePayment(t *testing.T) {
 	t.Run("create payment successfully", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-
 		order := &entity.Order{
 			ID:          1,
 			ClientId:    nil,
@@ -32,7 +28,7 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 			CreatedAt:   time.Now(),
 		}
 
-		qrCode := &mercado_pago.Response{QRData: "qr_data"}
+		qrCode := &entity.QRCodePayment{QRCode: "qr_data"}
 		body := input.PaymentDto{OrderId: order.ID, Type: string(enum.QRCODE)}
 		jsonBody, _ := json.Marshal(body)
 		bodyReader := bytes.NewReader(jsonBody)
@@ -42,11 +38,11 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 
 		loggerMock := slog.New(slog.NewTextHandler(os.Stderr, nil))
 
-		orderUseCaseMock := mock.NewMockOrderUseCase(ctrl)
-		orderUseCaseMock.EXPECT().GetById(1).Return(order, nil).Times(1)
+		orderUseCaseMock := contractmock.NewOrderUseCase(t)
+		orderUseCaseMock.On("GetById", 1).Return(order, nil).Once()
 
-		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
-		paymentUseCaseMock.EXPECT().CreateQRCode(r.Context(), order).Return(qrCode, nil)
+		paymentUseCaseMock := contractmock.NewPaymentUseCase(t)
+		paymentUseCaseMock.On("CreateQRCode", r.Context(), order).Return(qrCode, nil)
 
 		c := NewPaymentController(paymentUseCaseMock, loggerMock, orderUseCaseMock)
 		c.CreatePayment(w, r)
@@ -55,8 +51,6 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 	})
 
 	t.Run("invalid body", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-
 		wrongDTO := struct {
 			Data string
 		}{
@@ -64,8 +58,8 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 		}
 
 		loggerMock := slog.New(slog.NewTextHandler(os.Stderr, nil))
-		orderUseCaseMock := mock.NewMockOrderUseCase(ctrl)
-		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
+		orderUseCaseMock := contractmock.NewOrderUseCase(t)
+		paymentUseCaseMock := contractmock.NewPaymentUseCase(t)
 
 		jsonBody, _ := json.Marshal(wrongDTO)
 		bodyReader := bytes.NewReader(jsonBody)
@@ -86,14 +80,13 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 	})
 
 	t.Run("error getting order by id", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
 		expectedErr := errors.New("error connecting to database")
 
 		loggerMock := slog.New(slog.NewTextHandler(os.Stderr, nil))
-		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
+		paymentUseCaseMock := contractmock.NewPaymentUseCase(t)
 
-		orderUseCaseMock := mock.NewMockOrderUseCase(ctrl)
-		orderUseCaseMock.EXPECT().GetById(1).Return(nil, expectedErr).Times(1)
+		orderUseCaseMock := contractmock.NewOrderUseCase(t)
+		orderUseCaseMock.On("GetById", 1).Return(nil, expectedErr).Once()
 
 		body := input.PaymentDto{OrderId: 1, Type: string(enum.QRCODE)}
 		jsonBody, _ := json.Marshal(body)
@@ -115,14 +108,12 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 	})
 
 	t.Run("order not found error", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-
 		loggerMock := slog.New(slog.NewTextHandler(os.Stderr, nil))
 
-		orderUseCaseMock := mock.NewMockOrderUseCase(ctrl)
-		orderUseCaseMock.EXPECT().GetById(1).Return(nil, nil).Times(1)
+		orderUseCaseMock := contractmock.NewOrderUseCase(t)
+		orderUseCaseMock.On("GetById", 1).Return(nil, nil).Once()
 
-		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
+		paymentUseCaseMock := contractmock.NewPaymentUseCase(t)
 
 		body := input.PaymentDto{OrderId: 1, Type: string(enum.QRCODE)}
 		jsonBody, _ := json.Marshal(body)
@@ -144,8 +135,6 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 	})
 
 	t.Run("error creating qr code", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-
 		order := &entity.Order{
 			ID:          1,
 			ClientId:    nil,
@@ -162,11 +151,11 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 		w := httptest.NewRecorder()
 
 		loggerMock := slog.New(slog.NewTextHandler(os.Stderr, nil))
-		orderUseCaseMock := mock.NewMockOrderUseCase(ctrl)
-		orderUseCaseMock.EXPECT().GetById(1).Return(order, nil).Times(1)
+		orderUseCaseMock := contractmock.NewOrderUseCase(t)
+		orderUseCaseMock.On("GetById", 1).Return(order, nil).Once()
 
-		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
-		paymentUseCaseMock.EXPECT().CreateQRCode(r.Context(), order).Return(nil, errors.New("error creating qr code"))
+		paymentUseCaseMock := contractmock.NewPaymentUseCase(t)
+		paymentUseCaseMock.On("CreateQRCode", r.Context(), order).Return(nil, errors.New("error creating qr code"))
 
 		jsonResponse, _ := json.Marshal(Response{
 			Error: "Error creating qr code",
@@ -181,8 +170,6 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 	})
 
 	t.Run("empty qr code", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-
 		order := &entity.Order{
 			ID:          1,
 			ClientId:    nil,
@@ -199,11 +186,11 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 		w := httptest.NewRecorder()
 
 		loggerMock := slog.New(slog.NewTextHandler(os.Stderr, nil))
-		orderUseCaseMock := mock.NewMockOrderUseCase(ctrl)
-		orderUseCaseMock.EXPECT().GetById(1).Return(order, nil).Times(1)
+		orderUseCaseMock := contractmock.NewOrderUseCase(t)
+		orderUseCaseMock.On("GetById", 1).Return(order, nil).Once()
 
-		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
-		paymentUseCaseMock.EXPECT().CreateQRCode(r.Context(), order).Return(nil, nil)
+		paymentUseCaseMock := contractmock.NewPaymentUseCase(t)
+		paymentUseCaseMock.On("CreateQRCode", r.Context(), order).Return(nil, nil)
 
 		c := NewPaymentController(paymentUseCaseMock, loggerMock, orderUseCaseMock)
 		c.CreatePayment(w, r)
@@ -220,10 +207,8 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 
 func TestPaymentController_GetLastPaymentStatus(t *testing.T) {
 	t.Run("get last payment status successfully", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-
 		vars := map[string]string{
-			"paymentId": "1",
+			"id": "1",
 		}
 
 		r, _ := http.NewRequest("GET", "/payment/{paymentId}/status", nil)
@@ -231,10 +216,10 @@ func TestPaymentController_GetLastPaymentStatus(t *testing.T) {
 		r = mux.SetURLVars(r, vars)
 
 		loggerMock := slog.New(slog.NewTextHandler(os.Stderr, nil))
-		orderUseCaseMock := mock.NewMockOrderUseCase(ctrl)
+		orderUseCaseMock := contractmock.NewOrderUseCase(t)
 
-		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
-		paymentUseCaseMock.EXPECT().GetLastPaymentStatus(r.Context(), 1).Return(enum.PENDING, nil)
+		paymentUseCaseMock := contractmock.NewPaymentUseCase(t)
+		paymentUseCaseMock.On("GetLastPaymentStatus", r.Context(), 1).Return(enum.PENDING, nil)
 
 		c := NewPaymentController(paymentUseCaseMock, loggerMock, orderUseCaseMock)
 		c.GetLastPaymentStatus(w, r)
@@ -252,14 +237,12 @@ func TestPaymentController_GetLastPaymentStatus(t *testing.T) {
 	})
 
 	t.Run("error converting order id to int", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-
 		loggerMock := slog.New(slog.NewTextHandler(os.Stderr, nil))
-		orderUseCaseMock := mock.NewMockOrderUseCase(ctrl)
-		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
+		orderUseCaseMock := contractmock.NewOrderUseCase(t)
+		paymentUseCaseMock := contractmock.NewPaymentUseCase(t)
 
 		vars := map[string]string{
-			"paymentId": "not a number",
+			"id": "not a number",
 		}
 
 		r, _ := http.NewRequest("GET", "/status-payment", nil)
@@ -279,10 +262,8 @@ func TestPaymentController_GetLastPaymentStatus(t *testing.T) {
 	})
 
 	t.Run("error getting last payment status", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-
 		vars := map[string]string{
-			"paymentId": "1",
+			"id": "1",
 		}
 
 		r, _ := http.NewRequest("GET", "/payments/{paymentId}/status", nil)
@@ -290,10 +271,10 @@ func TestPaymentController_GetLastPaymentStatus(t *testing.T) {
 		r = mux.SetURLVars(r, vars)
 
 		loggerMock := slog.New(slog.NewTextHandler(os.Stderr, nil))
-		orderUseCaseMock := mock.NewMockOrderUseCase(ctrl)
+		orderUseCaseMock := contractmock.NewOrderUseCase(t)
 
-		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
-		paymentUseCaseMock.EXPECT().GetLastPaymentStatus(r.Context(), 1).Return(enum.PENDING, errors.New("error getting last payment status"))
+		paymentUseCaseMock := contractmock.NewPaymentUseCase(t)
+		paymentUseCaseMock.On("GetLastPaymentStatus", r.Context(), 1).Return(enum.PENDING, errors.New("error getting last payment status"))
 
 		c := NewPaymentController(paymentUseCaseMock, loggerMock, orderUseCaseMock)
 		c.GetLastPaymentStatus(w, r)
@@ -310,10 +291,8 @@ func TestPaymentController_GetLastPaymentStatus(t *testing.T) {
 
 func TestPaymentController_Notification(t *testing.T) {
 	t.Run("get last payment status successfully", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-
 		vars := map[string]string{
-			"paymentId": "1",
+			"id": "1",
 		}
 
 		r, _ := http.NewRequest("POST", "/payments/{paymentId}/notification-payments", nil)
@@ -321,10 +300,10 @@ func TestPaymentController_Notification(t *testing.T) {
 		r = mux.SetURLVars(r, vars)
 
 		loggerMock := slog.New(slog.NewTextHandler(os.Stderr, nil))
-		orderUseCaseMock := mock.NewMockOrderUseCase(ctrl)
+		orderUseCaseMock := contractmock.NewOrderUseCase(t)
 
-		paymentUseCaseMock := mock.NewMockPaymentUseCase(ctrl)
-		paymentUseCaseMock.EXPECT().ConfirmedPaymentNotification(r.Context(), 1).Return(nil)
+		paymentUseCaseMock := contractmock.NewPaymentUseCase(t)
+		paymentUseCaseMock.On("ConfirmedPaymentNotification", r.Context(), 1).Return(nil)
 
 		c := NewPaymentController(paymentUseCaseMock, loggerMock, orderUseCaseMock)
 		c.Notification(w, r)

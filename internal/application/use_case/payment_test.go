@@ -4,12 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract/mock"
+	contractmock "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract/mock"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/external_payment/mercado_pago"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"log/slog"
 	"os"
 	"testing"
@@ -19,14 +18,12 @@ func TestPaymentUseCase_GetLastPaymentStatus(t *testing.T) {
 	for _, tt := range lastPaymentStatusPayments() {
 		t.Run(fmt.Sprintf("get last payment status successfully:%s", tt.Type), func(t *testing.T) {
 			ctx := context.Background()
-			ctrl := gomock.NewController(t)
 			logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 
-			externalPaymentMock := mock.NewMockPaymentInterface(ctrl)
-
-			sns := mock.NewMockSnsService(ctrl)
-			repo := mock.NewMockPaymentRepository(ctrl)
-			repo.EXPECT().GetLastPaymentStatus(ctx, 1).Times(1).Return(tt.Payment, nil)
+			externalPaymentMock := new(contractmock.PaymentInterface[entity.QRCodePayment])
+			sns := contractmock.NewSnsService(t)
+			repo := contractmock.NewPaymentRepository(t)
+			repo.On("GetLastPaymentStatus", ctx, 1).Return(tt.Payment, nil).Once()
 
 			paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 			status, err := paymentUseCase.GetLastPaymentStatus(ctx, 1)
@@ -38,7 +35,6 @@ func TestPaymentUseCase_GetLastPaymentStatus(t *testing.T) {
 
 	t.Run("error getting last payment status", func(t *testing.T) {
 		ctx := context.Background()
-		ctrl := gomock.NewController(t)
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 		expectedErr := errors.New("error connecting to database")
 
@@ -50,11 +46,10 @@ func TestPaymentUseCase_GetLastPaymentStatus(t *testing.T) {
 			Amount:       132.45,
 		}
 
-		externalPaymentMock := mock.NewMockPaymentInterface(ctrl)
-
-		sns := mock.NewMockSnsService(ctrl)
-		repo := mock.NewMockPaymentRepository(ctrl)
-		repo.EXPECT().GetLastPaymentStatus(ctx, 1).Times(1).Return(payment, expectedErr)
+		externalPaymentMock := contractmock.NewPaymentInterface[entity.QRCodePayment](t)
+		sns := contractmock.NewSnsService(t)
+		repo := contractmock.NewPaymentRepository(t)
+		repo.On("GetLastPaymentStatus", ctx, 1).Once().Return(payment, expectedErr)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 		status, err := paymentUseCase.GetLastPaymentStatus(ctx, 1)
@@ -64,16 +59,9 @@ func TestPaymentUseCase_GetLastPaymentStatus(t *testing.T) {
 	})
 }
 
-type paymentTest struct {
-	Type     string
-	Payment  *entity.Payment
-	Expected enum.PaymentStatus
-}
-
 func TestPaymentUseCase_CreateQRCode(t *testing.T) {
 	t.Run("create qr code successfully", func(t *testing.T) {
 		ctx := context.Background()
-		ctrl := gomock.NewController(t)
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 
 		order := &entity.Order{
@@ -91,27 +79,25 @@ func TestPaymentUseCase_CreateQRCode(t *testing.T) {
 			Amount:       order.Amount,
 		}
 
-		qrCode := mercado_pago.Response{QRData: "qr data"}
+		qrCode := &entity.QRCodePayment{QRCode: "qr data"}
 
-		sns := mock.NewMockSnsService(ctrl)
+		sns := contractmock.NewSnsService(t)
+		repo := contractmock.NewPaymentRepository(t)
+		repo.On("GetLastPaymentStatus", ctx, 1).Once().Return(payment, nil)
+		repo.On("Create", ctx, mock.AnythingOfType("entity.Payment")).Once().Return(nil)
 
-		repo := mock.NewMockPaymentRepository(ctrl)
-		getLastPaymentStatus := repo.EXPECT().GetLastPaymentStatus(ctx, 1).Times(1).Return(payment, nil)
-		createPayment := repo.EXPECT().Create(ctx, gomock.Any()).Times(1).Return(payment, nil).After(getLastPaymentStatus)
-
-		externalPaymentMock := mock.NewMockPaymentInterface(ctrl)
-		externalPaymentMock.EXPECT().Process(gomock.Any()).Times(1).Return(qrCode, nil).After(createPayment)
+		externalPaymentMock := contractmock.NewPaymentInterface[entity.QRCodePayment](t)
+		externalPaymentMock.On("Process", mock.AnythingOfType("entity.Payment")).Once().Return(qrCode, nil)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 		code, err := paymentUseCase.CreateQRCode(ctx, order)
 
-		assert.Equal(t, code.QRCode, qrCode.QRData)
+		assert.Equal(t, code.QRCode, qrCode.QRCode)
 		assert.Nil(t, err)
 	})
 
 	t.Run("last status confirmed", func(t *testing.T) {
 		ctx := context.Background()
-		ctrl := gomock.NewController(t)
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 
 		order := &entity.Order{
@@ -129,11 +115,11 @@ func TestPaymentUseCase_CreateQRCode(t *testing.T) {
 			Amount:       order.Amount,
 		}
 
-		sns := mock.NewMockSnsService(ctrl)
-		externalPaymentMock := mock.NewMockPaymentInterface(ctrl)
+		sns := contractmock.NewSnsService(t)
+		externalPaymentMock := contractmock.NewPaymentInterface[entity.QRCodePayment](t)
 
-		repo := mock.NewMockPaymentRepository(ctrl)
-		repo.EXPECT().GetLastPaymentStatus(ctx, 1).Times(1).Return(payment, nil)
+		repo := contractmock.NewPaymentRepository(t)
+		repo.On("GetLastPaymentStatus", ctx, 1).Once().Return(payment, nil)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 		code, err := paymentUseCase.CreateQRCode(ctx, order)
@@ -144,7 +130,6 @@ func TestPaymentUseCase_CreateQRCode(t *testing.T) {
 
 	t.Run("get last payment status error", func(t *testing.T) {
 		ctx := context.Background()
-		ctrl := gomock.NewController(t)
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 		expectedErr := errors.New("error getting status")
 
@@ -155,11 +140,11 @@ func TestPaymentUseCase_CreateQRCode(t *testing.T) {
 			Amount:      123.45,
 		}
 
-		sns := mock.NewMockSnsService(ctrl)
-		externalPaymentMock := mock.NewMockPaymentInterface(ctrl)
+		sns := contractmock.NewSnsService(t)
+		externalPaymentMock := contractmock.NewPaymentInterface[entity.QRCodePayment](t)
 
-		repo := mock.NewMockPaymentRepository(ctrl)
-		repo.EXPECT().GetLastPaymentStatus(ctx, 1).Times(1).Return(nil, expectedErr)
+		repo := contractmock.NewPaymentRepository(t)
+		repo.On("GetLastPaymentStatus", ctx, 1).Once().Return(nil, expectedErr)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 		code, err := paymentUseCase.CreateQRCode(ctx, order)
@@ -172,15 +157,14 @@ func TestPaymentUseCase_CreateQRCode(t *testing.T) {
 func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 	t.Run("send notification successfully", func(t *testing.T) {
 		ctx := context.Background()
-		ctrl := gomock.NewController(t)
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 
-		externalPaymentMock := mock.NewMockPaymentInterface(ctrl)
-		repo := mock.NewMockPaymentRepository(ctrl)
-		updateStatus := repo.EXPECT().UpdateStatus(ctx, 1, enum.CONFIRMED).Times(1).Return(nil)
+		externalPaymentMock := contractmock.NewPaymentInterface[entity.QRCodePayment](t)
+		repo := contractmock.NewPaymentRepository(t)
+		repo.On("UpdateStatus", ctx, 1, enum.CONFIRMED).Once().Return(nil)
 
-		sns := mock.NewMockSnsService(ctrl)
-		sns.EXPECT().SendMessage(1, enum.CONFIRMED).Times(1).Return(nil).After(updateStatus)
+		sns := contractmock.NewSnsService(t)
+		sns.On("SendMessage", 1, enum.CONFIRMED).Once().Return(nil)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 		err := paymentUseCase.ConfirmedPaymentNotification(ctx, 1)
@@ -190,15 +174,14 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 
 	t.Run("error updating status", func(t *testing.T) {
 		ctx := context.Background()
-		ctrl := gomock.NewController(t)
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 		expectedErr := errors.New("error updating status")
 
-		sns := mock.NewMockSnsService(ctrl)
-		externalPaymentMock := mock.NewMockPaymentInterface(ctrl)
+		sns := contractmock.NewSnsService(t)
+		externalPaymentMock := contractmock.NewPaymentInterface[entity.QRCodePayment](t)
 
-		repo := mock.NewMockPaymentRepository(ctrl)
-		repo.EXPECT().UpdateStatus(ctx, 1, enum.CONFIRMED).Times(1).Return(expectedErr)
+		repo := contractmock.NewPaymentRepository(t)
+		repo.On("UpdateStatus", ctx, 1, enum.CONFIRMED).Once().Return(expectedErr)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 		err := paymentUseCase.ConfirmedPaymentNotification(ctx, 1)
@@ -208,22 +191,27 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 
 	t.Run("error sending message", func(t *testing.T) {
 		ctx := context.Background()
-		ctrl := gomock.NewController(t)
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 		expectedErr := errors.New("error sending message")
 
-		externalPaymentMock := mock.NewMockPaymentInterface(ctrl)
-		repo := mock.NewMockPaymentRepository(ctrl)
-		updateStatus := repo.EXPECT().UpdateStatus(ctx, 1, enum.CONFIRMED).Times(1).Return(nil)
+		externalPaymentMock := contractmock.NewPaymentInterface[entity.QRCodePayment](t)
+		repo := contractmock.NewPaymentRepository(t)
+		repo.On("UpdateStatus", ctx, 1, enum.CONFIRMED).Once().Return(nil)
 
-		sns := mock.NewMockSnsService(ctrl)
-		sns.EXPECT().SendMessage(1, enum.CONFIRMED).Times(1).Return(expectedErr).After(updateStatus)
+		sns := contractmock.NewSnsService(t)
+		sns.On("SendMessage", 1, enum.CONFIRMED).Once().Return(expectedErr)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 		err := paymentUseCase.ConfirmedPaymentNotification(ctx, 1)
 
 		assert.Error(t, expectedErr, err)
 	})
+}
+
+type paymentTest struct {
+	Type     string
+	Payment  *entity.Payment
+	Expected enum.PaymentStatus
 }
 
 func lastPaymentStatusPayments() []paymentTest {

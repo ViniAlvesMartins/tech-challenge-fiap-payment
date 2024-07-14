@@ -1,4 +1,4 @@
-//go:generate mockgen -destination=mock/uuid.go -source=uuid.go -package=mock
+//go:generate mockery --all --output mock --outpkg mock
 package uuid
 
 import "github.com/google/uuid"

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/config"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/controller/serializer/input"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/external_payment/mercado_pago"
 	"github.com/cucumber/godog"
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
@@ -25,8 +25,8 @@ func iSendAPostRequest() error {
 
 	expectedResponse = Response{
 		Error: "",
-		Data: mercado_pago.Response{
-			QRData: "00020101021243650016COM.MERCADOLIBRE02013063638f1192a-5fd1-4180-a180-8bcae3556bc35204000053039865802BR5925IZABEL AAAA DE MELO6007BARUERI62070503***63040B6D",
+		Data: entity.QRCodePayment{
+			QRCode: "00020101021243650016COM.MERCADOLIBRE02013063638f1192a-5fd1-4180-a180-8bcae3556bc35204000053039865802BR5925IZABEL AAAA DE MELO6007BARUERI62070503***63040B6D",
 		},
 	}
 

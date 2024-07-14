@@ -1,4 +1,4 @@
-//go:generate mockgen -destination=mock/service.go -source=service.go -package=mock
+//go:generate mockery --all --output mock --outpkg mock
 package contract
 
 import (
