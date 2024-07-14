@@ -164,7 +164,10 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 		repo.On("UpdateStatus", ctx, 1, enum.CONFIRMED).Once().Return(nil)
 
 		sns := contractmock.NewSnsService(t)
-		sns.On("SendMessage", 1, enum.CONFIRMED).Once().Return(nil)
+		sns.On("SendMessage", ctx, entity.PaymentMessage{
+			OrderId: 1,
+			Status:  enum.CONFIRMED,
+		}).Once().Return(nil)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 		err := paymentUseCase.ConfirmedPaymentNotification(ctx, 1)
@@ -199,7 +202,10 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 		repo.On("UpdateStatus", ctx, 1, enum.CONFIRMED).Once().Return(nil)
 
 		sns := contractmock.NewSnsService(t)
-		sns.On("SendMessage", 1, enum.CONFIRMED).Once().Return(expectedErr)
+		sns.On("SendMessage", ctx, entity.PaymentMessage{
+			OrderId: 1,
+			Status:  enum.CONFIRMED,
+		}).Once().Return(expectedErr)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 		err := paymentUseCase.ConfirmedPaymentNotification(ctx, 1)
