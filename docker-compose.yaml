@@ -5,7 +5,7 @@ include:
 
 services:
   dev-app-payment:
-    container_name: app.ze-burger-payments.dev
+    container_name: api.ze-burger-payments.dev
     env_file: .env
     build:
       dockerfile: ./infra/docker/Dockerfile
@@ -14,5 +14,17 @@ services:
       - .:/app
     ports:
       - 8081:8081
+    networks:
+      - dev-networks
+  dev-app-payment-worker:
+    container_name: worker.ze-burger-payments.dev
+    env_file: .env
+    command: >
+      sh -c "go run cmd/worker/main.go"
+    build:
+      dockerfile: ./infra/docker/Dockerfile
+      context: ./
+    volumes:
+      - .:/app
     networks:
       - dev-networks
