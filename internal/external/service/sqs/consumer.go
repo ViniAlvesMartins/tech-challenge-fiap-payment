@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/pkg/sqs"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-common/sqs"
 	"log"
 	"sync"
 )

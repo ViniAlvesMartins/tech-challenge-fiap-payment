@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-common/sns"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/use_case"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/config"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/handler/http_server"
@@ -9,11 +10,10 @@ import (
 	mercadopago "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/external_payment/mercado_pago"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/order"
 	snsproducer "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/sns"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/pkg/sns"
 	"github.com/go-resty/resty/v2"
 
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/pkg/dynamodb"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/pkg/uuid"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-common/dynamodb"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-common/uuid"
 	"log/slog"
 	"os"
 )

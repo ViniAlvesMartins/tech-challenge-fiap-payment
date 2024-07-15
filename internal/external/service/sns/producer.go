@@ -2,8 +2,8 @@ package sns
 
 import (
 	"context"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-common/sns"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/pkg/sns"
 )
 
 type Service struct {

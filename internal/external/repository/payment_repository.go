@@ -2,10 +2,10 @@ package repository
 
 import (
 	"context"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-common/uuid"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/pkg/uuid"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
