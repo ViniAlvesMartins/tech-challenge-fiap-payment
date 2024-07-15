@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/use_case"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/config"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/repository"
@@ -12,6 +13,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 )
 
@@ -20,6 +22,7 @@ func main() {
 	var ctx, cancel = context.WithCancel(context.Background())
 	var logger = loadLogger()
 
+	fmt.Println("Initializing worker...")
 	cfg, err := loadConfig()
 
 	if err != nil {
@@ -44,13 +47,19 @@ func main() {
 	paymentUseCase := use_case.NewPaymentUseCase(paymentRepository, nil, nil, logger)
 	failedProductionHandler := sqs.NewFailedProductionHandler(paymentUseCase)
 
+	fmt.Println("Starting consumer...")
 	failedProductionConsumer := sqs.NewConsumer(consumer, failedProductionHandler)
-	failedProductionConsumer.Start(ctx)
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go failedProductionConsumer.Start(ctx, &wg)
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
 	<-sc
 	cancel()
+	wg.Wait()
+	fmt.Println("Finishing worker...")
 }
 
 func loadUUID() uuid.Interface {

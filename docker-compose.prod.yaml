@@ -1,0 +1,25 @@
+version: '3.9'
+
+include:
+  - "docker-compose-network.yaml"
+
+services:
+  prod-app-payment:
+    container_name: api.ze-burger-payments.prod
+    env_file: .env
+    build:
+      dockerfile: ./infra/docker/prod/Dockerfile
+      context: ./
+    ports:
+      - 8081:8081
+    networks:
+      - dev-networks
+  prod-app-payment-worker:
+    container_name: worker.ze-burger-payments.prod
+    env_file: .env
+    command: ["./cmd/worker/main"]
+    build:
+      dockerfile: ./infra/docker/prod/Dockerfile
+      context: ./
+    networks:
+      - dev-networks

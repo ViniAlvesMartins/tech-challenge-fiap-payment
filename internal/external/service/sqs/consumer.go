@@ -3,8 +3,10 @@ package sqs
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/pkg/sqs"
 	"log"
+	"sync"
 )
 
 type Handler interface {
@@ -31,8 +33,10 @@ func NewConsumer(s *sqs.Service, h Handler) *Consumer {
 	}
 }
 
-func (c *Consumer) Start(ctx context.Context) error {
+func (c *Consumer) Start(ctx context.Context, wg *sync.WaitGroup) {
+	defer wg.Done()
 	for {
+		fmt.Println("Waiting for message...")
 		m, err := c.service.ReceiveMessage(ctx)
 		if err != nil {
 			log.Println(err.Error())
@@ -61,7 +65,8 @@ func (c *Consumer) Start(ctx context.Context) error {
 
 		select {
 		case <-ctx.Done():
-			break
+			fmt.Println("Closing consumer...")
+			return
 		}
 	}
 }
