@@ -5,7 +5,7 @@ go 1.22
 toolchain go1.22.5
 
 require (
-	github.com/ViniAlvesMartins/tech-challenge-fiap-common v0.0.0-20240715231650-6273ad3c99a7
+	github.com/ViniAlvesMartins/tech-challenge-fiap-common v0.0.1
 	github.com/aws/aws-sdk-go v1.53.2
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.13.17
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.34.3

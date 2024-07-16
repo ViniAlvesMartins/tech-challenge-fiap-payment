@@ -1,7 +1,7 @@
 github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc=
 github.com/KyleBanks/depth v1.2.1/go.mod h1:jzSb9d0L43HxTQfT+oSA1EEp2q+ne2uh6XgeJcm8brE=
-github.com/ViniAlvesMartins/tech-challenge-fiap-common v0.0.0-20240715231650-6273ad3c99a7 h1:iCImzzgaEpJ8N4MVrMLbB+LGtJVTOC09A4Dfc7TY0Ao=
-github.com/ViniAlvesMartins/tech-challenge-fiap-common v0.0.0-20240715231650-6273ad3c99a7/go.mod h1:4wtoucCAB/gjEsrr2jKFez6lwJhtiU/sR85QXVzr+BY=
+github.com/ViniAlvesMartins/tech-challenge-fiap-common v0.0.1 h1:mVsisUHpmQan4nz7aioboKKcA4AOIBpzhA8KPdd1cYE=
+github.com/ViniAlvesMartins/tech-challenge-fiap-common v0.0.1/go.mod h1:4wtoucCAB/gjEsrr2jKFez6lwJhtiU/sR85QXVzr+BY=
 github.com/aws/aws-sdk-go v1.53.2 h1:KhTx/eMkavqkpmrV+aBc+bWADSTzwKxTXOvGmRImgFs=
 github.com/aws/aws-sdk-go v1.53.2/go.mod h1:LF8svs817+Nz+DmiMQKTO3ubZ/6IaTpq3TjupRn3Eqk=
 github.com/aws/aws-sdk-go-v2 v1.30.3 h1:jUeBtG0Ih+ZIFH0F4UkmL9w3cSpaMv9tYYDbzILP8dY=
