@@ -19,7 +19,39 @@ services:
     networks:
       - dev-networks
 
-  mock-server:
+  payment-aws-cli:
+    image: amazon/aws-cli
+    container_name: payment-aws-cli
+    depends_on:
+      - payment-localstack
+    env_file: .env
+    entrypoint:
+      - sh
+      - -c
+      - |
+        aws --endpoint-url=http://payment-localstack:4566 dynamodb create-table --cli-input-json '{"TableName":"payments", "KeySchema":[{"AttributeName":"order_id","KeyType":"HASH"}], "AttributeDefinitions":[ {"AttributeName":"order_id","AttributeType":"N"}], "BillingMode":"PAY_PER_REQUEST"}' --region us-east-1 --output table | cat
+        aws --endpoint-url=http://payment-localstack:4566 sns create-topic --name update_order_status --region us-east-1 --output table | cat
+        aws --endpoint-url=http://payment-localstack:4566 sqs create-queue --queue-name production-failed-queue --region us-east-1 --output table | cat
+        aws --endpoint-url=http://payment-localstack:4566 sqs list-queues --region us-east-1 --output table | cat
+        aws --endpoint-url=http://payment-localstack:4566 sns subscribe --topic-arn arn:aws:sns:us-east-1:000000000000:update_order_status --protocol sqs --notification-endpoint arn:aws:sqs:us-east-1:000000000000:production-failed-queue --region us-east-1 --output table | cat
+    networks:
+      - dev-networks
+
+  payment-dynamodb-admin:
+    image: aaronshaf/dynamodb-admin
+    ports:
+      - "8001:8001"
+    environment:
+      DYNAMO_ENDPOINT: "http://payment-localstack:4566"
+      AWS_REGION: "us-east-1"
+      AWS_ACCESS_KEY_ID: foobar
+      AWS_SECRET_ACCESS_KEY: foobar
+    depends_on:
+      - payment-localstack
+    networks:
+      - dev-networks
+
+  mock-order-server:
     container_name: app.ze-burger-payments.orders-mock.dev
     image: mockoon/cli:latest
     command: [ "--data", "data", "--port", "8002" ]

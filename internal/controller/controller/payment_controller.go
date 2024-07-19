@@ -21,8 +21,8 @@ type PaymentController struct {
 }
 
 type GetLastPaymentStatus struct {
-	OrderId       int
-	PaymentStatus enum.PaymentStatus
+	OrderId       int                `json:"id"`
+	PaymentStatus enum.PaymentStatus `json:"status"`
 }
 
 func NewPaymentController(p contract.PaymentUseCase, logger *slog.Logger, orderUseCase contract.OrderUseCase) *PaymentController {
