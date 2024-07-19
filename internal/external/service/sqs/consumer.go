@@ -10,7 +10,7 @@ import (
 )
 
 type Handler interface {
-	Handle(b []byte) error
+	Handle(ctx context.Context, b []byte) error
 }
 
 type Consumer struct {
@@ -53,7 +53,7 @@ func (c *Consumer) Start(ctx context.Context, wg *sync.WaitGroup) {
 			continue
 		}
 
-		if err = c.handler.Handle([]byte(body.Message)); err != nil {
+		if err = c.handler.Handle(ctx, []byte(body.Message)); err != nil {
 			log.Println(err.Error())
 			continue
 		}
