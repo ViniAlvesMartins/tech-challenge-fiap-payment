@@ -90,11 +90,11 @@ func TestPaymentRepository_GetLastPaymentStatus(t *testing.T) {
 
 		dynamoOutput := &dynamodb.GetItemOutput{
 			Item: map[string]types.AttributeValue{
-				"order_id":   &types.AttributeValueMemberN{Value: strconv.Itoa(p.OrderID)},
-				"payment_id": &types.AttributeValueMemberS{Value: p.PaymentID},
-				"type":       &types.AttributeValueMemberS{Value: string(p.Type)},
-				"status":     &types.AttributeValueMemberS{Value: string(p.CurrentState)},
-				"amount":     &types.AttributeValueMemberN{Value: fmt.Sprint(p.Amount)},
+				"order_id":      &types.AttributeValueMemberN{Value: strconv.Itoa(p.OrderID)},
+				"payment_id":    &types.AttributeValueMemberS{Value: p.PaymentID},
+				"type":          &types.AttributeValueMemberS{Value: string(p.Type)},
+				"current_state": &types.AttributeValueMemberS{Value: string(p.CurrentState)},
+				"amount":        &types.AttributeValueMemberN{Value: fmt.Sprint(p.Amount)},
 			},
 		}
 
@@ -152,11 +152,11 @@ func TestPaymentRepository_GetLastPaymentStatus(t *testing.T) {
 
 		dynamoOutput := &dynamodb.GetItemOutput{
 			Item: map[string]types.AttributeValue{
-				"order_id":   &types.AttributeValueMemberN{Value: fmt.Sprint(p.OrderID)},
-				"payment_id": &types.AttributeValueMemberS{Value: p.PaymentID},
-				"type":       &types.AttributeValueMemberS{Value: string(p.Type)},
-				"status":     &types.AttributeValueMemberS{Value: string(p.CurrentState)},
-				"amount":     &types.AttributeValueMemberS{Value: fmt.Sprint(p.Amount)},
+				"order_id":      &types.AttributeValueMemberN{Value: fmt.Sprint(p.OrderID)},
+				"payment_id":    &types.AttributeValueMemberS{Value: p.PaymentID},
+				"type":          &types.AttributeValueMemberS{Value: string(p.Type)},
+				"current_state": &types.AttributeValueMemberS{Value: string(p.CurrentState)},
+				"amount":        &types.AttributeValueMemberS{Value: fmt.Sprint(p.Amount)},
 			},
 		}
 
