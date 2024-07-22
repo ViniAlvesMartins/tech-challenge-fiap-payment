@@ -159,9 +159,19 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 		ctx := context.Background()
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 
+		payment := entity.Payment{
+			PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
+			OrderID:      1,
+			Type:         enum.QRCODE,
+			CurrentState: enum.PENDING,
+			Amount:       123.45,
+		}
+
 		externalPaymentMock := contractmock.NewPaymentInterface[entity.QRCodePayment](t)
 		repo := contractmock.NewPaymentRepository(t)
-		repo.On("UpdateStatus", ctx, 1, enum.CONFIRMED).Once().Return(nil)
+		repo.On("GetLastPaymentStatus", ctx, payment.OrderID).Once().Return(&payment, nil)
+
+		repo.On("UpdateStatus", ctx, payment.OrderID, enum.CONFIRMED).Once().Return(nil)
 
 		sns := contractmock.NewSnsService(t)
 		sns.On("SendMessage", ctx, entity.PaymentMessage{
@@ -170,7 +180,7 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 		}).Once().Return(nil)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
-		err := paymentUseCase.ConfirmedPaymentNotification(ctx, 1)
+		err := paymentUseCase.ConfirmedPaymentNotification(ctx, payment.OrderID)
 
 		assert.Nil(t, err)
 	})
@@ -180,14 +190,23 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 		expectedErr := errors.New("error updating status")
 
+		payment := entity.Payment{
+			PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
+			OrderID:      1,
+			Type:         enum.QRCODE,
+			CurrentState: enum.PENDING,
+			Amount:       123.45,
+		}
+
 		sns := contractmock.NewSnsService(t)
 		externalPaymentMock := contractmock.NewPaymentInterface[entity.QRCodePayment](t)
 
 		repo := contractmock.NewPaymentRepository(t)
-		repo.On("UpdateStatus", ctx, 1, enum.CONFIRMED).Once().Return(expectedErr)
+		repo.On("GetLastPaymentStatus", ctx, payment.OrderID).Once().Return(&payment, nil)
+		repo.On("UpdateStatus", ctx, payment.OrderID, enum.CONFIRMED).Once().Return(expectedErr)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
-		err := paymentUseCase.ConfirmedPaymentNotification(ctx, 1)
+		err := paymentUseCase.ConfirmedPaymentNotification(ctx, payment.OrderID)
 
 		assert.Error(t, expectedErr, err)
 	})
@@ -197,8 +216,17 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 		logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 		expectedErr := errors.New("error sending message")
 
+		payment := entity.Payment{
+			PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
+			OrderID:      1,
+			Type:         enum.QRCODE,
+			CurrentState: enum.PENDING,
+			Amount:       123.45,
+		}
+
 		externalPaymentMock := contractmock.NewPaymentInterface[entity.QRCodePayment](t)
 		repo := contractmock.NewPaymentRepository(t)
+		repo.On("GetLastPaymentStatus", ctx, payment.OrderID).Once().Return(&payment, nil)
 		repo.On("UpdateStatus", ctx, 1, enum.CONFIRMED).Once().Return(nil)
 
 		sns := contractmock.NewSnsService(t)
@@ -206,6 +234,8 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 			OrderId: 1,
 			Status:  enum.CONFIRMED,
 		}).Once().Return(expectedErr)
+
+		repo.On("UpdateStatus", ctx, 1, enum.PENDING).Once().Return(nil)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 		err := paymentUseCase.ConfirmedPaymentNotification(ctx, 1)
@@ -234,13 +264,7 @@ func lastPaymentStatusPayments() []paymentTest {
 			Type:     fmt.Sprintf("[%s status]", string(enum.PENDING)),
 		},
 		{
-			Payment: &entity.Payment{
-				PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f1",
-				OrderID:      1,
-				Type:         enum.QRCODE,
-				CurrentState: "",
-				Amount:       132.45,
-			},
+			Payment:  nil,
 			Expected: enum.PENDING,
 			Type:     "[empty status]",
 		},
