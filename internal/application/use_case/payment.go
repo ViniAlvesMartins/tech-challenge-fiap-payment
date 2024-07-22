@@ -7,8 +7,12 @@ import (
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
-	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"log/slog"
+)
+
+var (
+	ErrConfirmingPayment = errors.New("error confirming payment")
+	ErrCancelingPayment  = errors.New("error canceling payment")
 )
 
 type PaymentUseCase struct {
@@ -32,18 +36,12 @@ func (p *PaymentUseCase) create(ctx context.Context, payment *entity.Payment) er
 }
 
 func (p *PaymentUseCase) GetLastPaymentStatus(ctx context.Context, paymentId int) (enum.PaymentStatus, error) {
-	var notFoundErr *types.ResourceNotFoundException
-
 	payment, err := p.repository.GetLastPaymentStatus(ctx, paymentId)
 	if err != nil {
-		if errors.As(err, &notFoundErr) {
-			return enum.PENDING, nil
-		}
-
 		return enum.PENDING, err
 	}
 
-	if payment != nil && payment.CurrentState == "" {
+	if payment == nil {
 		return enum.PENDING, nil
 	}
 
@@ -79,34 +77,35 @@ func (p *PaymentUseCase) CreateQRCode(ctx context.Context, order *entity.Order) 
 }
 
 func (p *PaymentUseCase) ConfirmedPaymentNotification(ctx context.Context, id int) error {
-	if err := p.repository.UpdateStatus(ctx, id, enum.CONFIRMED); err != nil {
-		return err
-	}
-
-	payment := entity.PaymentMessage{
-		OrderId: id,
-		Status:  enum.CONFIRMED,
-	}
-
-	if err := p.snsService.SendMessage(ctx, payment); err != nil {
-		return err
-	}
-
-	return nil
+	return p.processPayment(ctx, id, enum.CONFIRMED, ErrConfirmingPayment)
 }
 
 func (p *PaymentUseCase) CanceledPaymentNotification(ctx context.Context, id int) error {
-	if err := p.repository.UpdateStatus(ctx, id, enum.CANCELED); err != nil {
-		return err
+	return p.processPayment(ctx, id, enum.CANCELED, ErrCancelingPayment)
+}
+
+func (p *PaymentUseCase) processPayment(ctx context.Context, id int, status enum.PaymentStatus, operationErr error) error {
+	lastStatus, err := p.GetLastPaymentStatus(ctx, id)
+	if err != nil {
+		return errors.Join(operationErr, err)
+	}
+
+	if err = p.repository.UpdateStatus(ctx, id, status); err != nil {
+		return errors.Join(operationErr, err)
 	}
 
 	payment := entity.PaymentMessage{
 		OrderId: id,
-		Status:  enum.CANCELED,
+		Status:  status,
 	}
 
-	if err := p.snsService.SendMessage(ctx, payment); err != nil {
-		return err
+	if err = p.snsService.SendMessage(ctx, payment); err != nil {
+		// rollback payment status
+		if err = p.repository.UpdateStatus(ctx, id, lastStatus); err != nil {
+			return errors.Join(operationErr, err)
+		}
+
+		return errors.Join(operationErr, err)
 	}
 
 	return nil

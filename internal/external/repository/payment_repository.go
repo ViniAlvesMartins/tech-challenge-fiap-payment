@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-common/uuid"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
@@ -53,6 +54,7 @@ func (p *PaymentRepository) Create(ctx context.Context, payment entity.Payment) 
 
 func (p *PaymentRepository) GetLastPaymentStatus(ctx context.Context, orderId int) (*entity.Payment, error) {
 	var payment *entity.Payment
+	var notFoundErr *types.ResourceNotFoundException
 
 	out, err := p.db.GetItem(ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(table),
@@ -62,6 +64,10 @@ func (p *PaymentRepository) GetLastPaymentStatus(ctx context.Context, orderId in
 	})
 
 	if err != nil {
+		if errors.As(err, &notFoundErr) {
+			return nil, nil
+		}
+
 		return nil, err
 	}
 

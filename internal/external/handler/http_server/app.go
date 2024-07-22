@@ -42,6 +42,7 @@ func (e *App) Run() {
 	paymentController := controller.NewPaymentController(e.paymentUseCase, e.logger, e.orderUseCase)
 	router.HandleFunc("/payments", paymentController.CreatePayment).Methods("POST")
 	router.HandleFunc("/payments/{id:[0-9]+}/status", paymentController.GetLastPaymentStatus).Methods("GET")
+	router.HandleFunc("/payments/{id:[0-9]+}/cancel", paymentController.CancelPayment).Methods("DELETE")
 	router.HandleFunc("/payments/{id:[0-9]+}/notification", paymentController.Notification).Methods("POST")
 	router.PathPrefix("/docs").Handler(httpSwagger.WrapHandler)
 

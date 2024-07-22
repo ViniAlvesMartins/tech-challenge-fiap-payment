@@ -78,6 +78,36 @@ paths:
       summary: Start payment process
       tags:
       - Payments
+  /payments/{id}/cancel:
+    delete:
+      consumes:
+      - application/json
+      description: Payment cancelation endpoint
+      parameters:
+      - description: Payment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/swagger.InternalServerErrorResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Payment cancelation endpoint
+      tags:
+      - Payments
   /payments/{id}/notification:
     post:
       consumes:

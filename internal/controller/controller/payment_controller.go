@@ -234,3 +234,47 @@ func (p *PaymentController) Notification(w http.ResponseWriter, r *http.Request)
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 }
+
+// Notification godoc
+// @Summary      Payment cancelation endpoint
+// @Description  Payment cancelation endpoint
+// @Tags         Payments
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int  true  "Payment ID"
+// @Success      204  {object}  interface{}
+// @Failure      500  {object}  swagger.InternalServerErrorResponse{data=interface{}}
+// @Router       /payments/{id}/cancel [delete]
+func (p *PaymentController) CancelPayment(w http.ResponseWriter, r *http.Request) {
+	paymentIdParam := mux.Vars(r)["id"]
+
+	paymentId, err := strconv.Atoi(paymentIdParam)
+	if err != nil {
+		p.logger.Error("error to convert id order to int", slog.Any("error", err.Error()))
+
+		w.WriteHeader(http.StatusInternalServerError)
+		jsonResponse, _ := json.Marshal(
+			Response{
+				Error: "Order id must be an integer",
+				Data:  nil,
+			})
+		w.Write(jsonResponse)
+		return
+	}
+
+	if err = p.paymentUseCase.CanceledPaymentNotification(r.Context(), paymentId); err != nil {
+		p.logger.Error("error canceling payment", slog.Any("error", err.Error()))
+
+		w.WriteHeader(http.StatusInternalServerError)
+		jsonResponse, _ := json.Marshal(
+			Response{
+				Error: "error canceling payment",
+				Data:  nil,
+			})
+		w.Write(jsonResponse)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNoContent)
+}

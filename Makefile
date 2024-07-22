@@ -2,13 +2,13 @@ build:
 	docker-compose build
 
 run-app:
-	docker-compose -f docker-compose.yaml up
+	docker-compose up dev-app-payment
+
+run-worker:
+	docker-compose up dev-app-payment-worker
 
 start-infra:
-	docker-compose -f docker-compose-infra.yaml up -d
-
-create-resources:
-	./infra/docker/local/localstack.sh
+	docker-compose -f docker-compose-infra.yaml up
 
 swagger:
 	docker-compose run dev-app-payment swag init -g internal/external/handler/http_server/app.go -o doc/swagger/
