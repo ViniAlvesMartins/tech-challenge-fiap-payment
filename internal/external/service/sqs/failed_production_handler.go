@@ -3,9 +3,9 @@ package sqs
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
+	"log/slog"
 )
 
 type FailedProductionMessage struct {
@@ -15,16 +15,17 @@ type FailedProductionMessage struct {
 
 type FailedProductHandler struct {
 	payment contract.PaymentUseCase
+	logger  *slog.Logger
 }
 
-func NewFailedProductionHandler(p contract.PaymentUseCase) *FailedProductHandler {
-	return &FailedProductHandler{payment: p}
+func NewFailedProductionHandler(p contract.PaymentUseCase, l *slog.Logger) *FailedProductHandler {
+	return &FailedProductHandler{payment: p, logger: l}
 }
 
 func (f *FailedProductHandler) Handle(ctx context.Context, b []byte) error {
 	var message FailedProductionMessage
 
-	fmt.Println("Handling message...")
+	f.logger.Info("Handling message...")
 
 	if err := json.Unmarshal(b, &message); err != nil {
 		return err

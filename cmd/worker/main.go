@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-common/dynamodb"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-common/sns"
 	sqsservice "github.com/ViniAlvesMartins/tech-challenge-fiap-common/sqs"
@@ -25,7 +24,7 @@ func main() {
 	var ctx, cancel = context.WithCancel(context.Background())
 	var logger = loadLogger()
 
-	fmt.Println("Initializing worker...")
+	logger.Info("Initializing worker...")
 	cfg, err := loadConfig()
 
 	if err != nil {
@@ -55,10 +54,10 @@ func main() {
 	snsService := snsproducer.NewService(snsConnection)
 	qrCodePaymentMethod := use_case.NewQRCode(mercadopago.NewPaymentGateway())
 	paymentUseCase := use_case.NewPaymentUseCase(paymentRepository, qrCodePaymentMethod, snsService, logger)
-	failedProductionHandler := sqs.NewFailedProductionHandler(paymentUseCase)
+	failedProductionHandler := sqs.NewFailedProductionHandler(paymentUseCase, logger)
 
-	fmt.Println("Starting consumer...")
-	failedProductionConsumer := sqs.NewConsumer(consumer, failedProductionHandler)
+	logger.Info("Starting consumer...")
+	failedProductionConsumer := sqs.NewConsumer(consumer, failedProductionHandler, logger)
 
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -69,7 +68,7 @@ func main() {
 	<-sc
 	cancel()
 	wg.Wait()
-	fmt.Println("Finishing worker...")
+	logger.Info("Finishing worker...")
 }
 
 func loadUUID() uuid.Interface {

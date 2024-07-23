@@ -3,9 +3,9 @@ package sqs
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-common/sqs"
 	"log"
+	"log/slog"
 	"sync"
 )
 
@@ -16,6 +16,7 @@ type Handler interface {
 type Consumer struct {
 	service *sqs.Service
 	handler Handler
+	logger  *slog.Logger
 }
 
 type MessageBody struct {
@@ -26,10 +27,11 @@ type MessageBody struct {
 	Timestamp string
 }
 
-func NewConsumer(s *sqs.Service, h Handler) *Consumer {
+func NewConsumer(s *sqs.Service, h Handler, l *slog.Logger) *Consumer {
 	return &Consumer{
 		service: s,
 		handler: h,
+		logger:  l,
 	}
 }
 
@@ -39,7 +41,7 @@ func (c *Consumer) Start(ctx context.Context, wg *sync.WaitGroup) {
 	for {
 		select {
 		case <-ctx.Done():
-			fmt.Println("Closing consumer...")
+			c.logger.Info("Closing consumer...")
 			return
 		default:
 		}
@@ -49,7 +51,7 @@ func (c *Consumer) Start(ctx context.Context, wg *sync.WaitGroup) {
 }
 
 func (c *Consumer) consume(ctx context.Context) {
-	fmt.Println("Waiting for message...")
+	c.logger.Info("Waiting for message...")
 	m, err := c.service.ReceiveMessage(ctx)
 	if err != nil {
 		log.Println(err.Error())
@@ -62,17 +64,17 @@ func (c *Consumer) consume(ctx context.Context) {
 
 	var body *MessageBody
 	if err = json.Unmarshal([]byte(*m.Body), &body); err != nil {
-		fmt.Println(err.Error())
+		c.logger.Error("error unmarshalling message", slog.String("error", err.Error()))
 		return
 	}
 
 	if err = c.handler.Handle(ctx, []byte(body.Message)); err != nil {
-		fmt.Println(err.Error())
+		c.logger.Error("error handling message", slog.String("error", err.Error()))
 		return
 	}
 
 	if err = c.service.DeleteMessage(ctx, *m.ReceiptHandle); err != nil {
-		fmt.Println(err.Error())
+		c.logger.Error("error deleting message", slog.String("error", err.Error()))
 		return
 	}
 }
