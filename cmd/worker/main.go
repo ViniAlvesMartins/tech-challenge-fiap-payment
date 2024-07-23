@@ -4,11 +4,14 @@ import (
 	"context"
 	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-common/dynamodb"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-common/sns"
 	sqsservice "github.com/ViniAlvesMartins/tech-challenge-fiap-common/sqs"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-common/uuid"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/use_case"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/config"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/repository"
+	mercadopago "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/external_payment/mercado_pago"
+	snsproducer "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/sns"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/external/service/sqs"
 	"log/slog"
 	"os"
@@ -36,15 +39,22 @@ func main() {
 		panic(err)
 	}
 
-	paymentRepository := repository.NewPaymentRepository(db, logger, loadUUID())
-
 	consumer, err := sqsservice.NewConnection(ctx, cfg.ProductionFailedQueue, 1, 20)
 	if err != nil {
 		logger.Error("error connecting to sqs", err)
 		panic(err)
 	}
 
-	paymentUseCase := use_case.NewPaymentUseCase(paymentRepository, nil, nil, logger)
+	paymentRepository := repository.NewPaymentRepository(db, logger, loadUUID())
+	snsConnection, err := sns.NewConnection(ctx, cfg.UpdateOrderStatusTopic)
+	if err != nil {
+		logger.Error("error connecting to sns", err)
+		panic(err)
+	}
+
+	snsService := snsproducer.NewService(snsConnection)
+	qrCodePaymentMethod := use_case.NewQRCode(mercadopago.NewPaymentGateway())
+	paymentUseCase := use_case.NewPaymentUseCase(paymentRepository, qrCodePaymentMethod, snsService, logger)
 	failedProductionHandler := sqs.NewFailedProductionHandler(paymentUseCase)
 
 	fmt.Println("Starting consumer...")

@@ -3,6 +3,7 @@ package sqs
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
 )
@@ -22,6 +23,8 @@ func NewFailedProductionHandler(p contract.PaymentUseCase) *FailedProductHandler
 
 func (f *FailedProductHandler) Handle(ctx context.Context, b []byte) error {
 	var message FailedProductionMessage
+
+	fmt.Println("Handling message...")
 
 	if err := json.Unmarshal(b, &message); err != nil {
 		return err

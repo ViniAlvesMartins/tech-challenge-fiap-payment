@@ -35,38 +35,44 @@ func NewConsumer(s *sqs.Service, h Handler) *Consumer {
 
 func (c *Consumer) Start(ctx context.Context, wg *sync.WaitGroup) {
 	defer wg.Done()
+
 	for {
-		fmt.Println("Waiting for message...")
-		m, err := c.service.ReceiveMessage(ctx)
-		if err != nil {
-			log.Println(err.Error())
-			continue
-		}
-
-		if m == nil {
-			continue
-		}
-
-		var body *MessageBody
-		if err = json.Unmarshal([]byte(*m.Body), &body); err != nil {
-			log.Println(err.Error())
-			continue
-		}
-
-		if err = c.handler.Handle(ctx, []byte(body.Message)); err != nil {
-			log.Println(err.Error())
-			continue
-		}
-
-		if err = c.service.DeleteMessage(ctx, *m.ReceiptHandle); err != nil {
-			log.Println(err.Error())
-			continue
-		}
-
 		select {
 		case <-ctx.Done():
 			fmt.Println("Closing consumer...")
 			return
+		default:
 		}
+
+		c.consume(ctx)
+	}
+}
+
+func (c *Consumer) consume(ctx context.Context) {
+	fmt.Println("Waiting for message...")
+	m, err := c.service.ReceiveMessage(ctx)
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+
+	if m == nil {
+		return
+	}
+
+	var body *MessageBody
+	if err = json.Unmarshal([]byte(*m.Body), &body); err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	if err = c.handler.Handle(ctx, []byte(body.Message)); err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	if err = c.service.DeleteMessage(ctx, *m.ReceiptHandle); err != nil {
+		fmt.Println(err.Error())
+		return
 	}
 }
