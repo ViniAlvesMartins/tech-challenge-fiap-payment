@@ -50,7 +50,7 @@ func (s *SnsService) SendMessage(paymentId int, status enum.PaymentStatus) error
 
 	input := &sns.PublishInput{
 		Message:  aws.String(snsMessage),
-		TopicArn: aws.String("arn:aws:sns:us-east-1:682279319757:update_order_status-topic"),
+		TopicArn: aws.String("arn:aws:sns:us-east-1:961381910932:update_order_status-topic"),
 	}
 
 	result, err := client.Publish(context.TODO(), input)
