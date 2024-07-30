@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract"
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
 	"log/slog"
 )
@@ -38,5 +39,12 @@ func (f *OrderCreatedHandler) Handle(ctx context.Context, b []byte) error {
 		return nil
 	}
 
-	return nil
+	order := &entity.Order{
+		ID:     message.ID,
+		Amount: message.Amount,
+	}
+
+	_, err := f.payment.CreateQRCode(ctx, order)
+
+	return err
 }
