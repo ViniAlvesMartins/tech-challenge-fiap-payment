@@ -41,8 +41,8 @@ func TestPaymentUseCase_GetLastPaymentStatus(t *testing.T) {
 		payment := &entity.Payment{
 			PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
 			OrderID:      1,
-			Type:         enum.QRCODE,
-			CurrentState: enum.PENDING,
+			Type:         enum.PaymentTypeQRCode,
+			CurrentState: enum.PaymentStatusPending,
 			Amount:       132.45,
 		}
 
@@ -67,15 +67,15 @@ func TestPaymentUseCase_CreateQRCode(t *testing.T) {
 		order := &entity.Order{
 			ID:          1,
 			ClientId:    nil,
-			StatusOrder: enum.PREPARING,
+			OrderStatus: enum.OrderStatusPreparing,
 			Amount:      123.45,
 		}
 
 		payment := &entity.Payment{
 			PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
 			OrderID:      order.ID,
-			Type:         enum.QRCODE,
-			CurrentState: enum.PENDING,
+			Type:         enum.PaymentTypeQRCode,
+			CurrentState: enum.PaymentStatusPending,
 			Amount:       order.Amount,
 		}
 
@@ -103,15 +103,15 @@ func TestPaymentUseCase_CreateQRCode(t *testing.T) {
 		order := &entity.Order{
 			ID:          1,
 			ClientId:    nil,
-			StatusOrder: enum.PREPARING,
+			OrderStatus: enum.OrderStatusPreparing,
 			Amount:      123.45,
 		}
 
 		payment := &entity.Payment{
 			PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
 			OrderID:      order.ID,
-			Type:         enum.QRCODE,
-			CurrentState: enum.CONFIRMED,
+			Type:         enum.PaymentTypeQRCode,
+			CurrentState: enum.PaymentStatusConfirmed,
 			Amount:       order.Amount,
 		}
 
@@ -136,7 +136,7 @@ func TestPaymentUseCase_CreateQRCode(t *testing.T) {
 		order := &entity.Order{
 			ID:          1,
 			ClientId:    nil,
-			StatusOrder: enum.PREPARING,
+			OrderStatus: enum.OrderStatusPreparing,
 			Amount:      123.45,
 		}
 
@@ -162,8 +162,8 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 		payment := entity.Payment{
 			PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
 			OrderID:      1,
-			Type:         enum.QRCODE,
-			CurrentState: enum.PENDING,
+			Type:         enum.PaymentTypeQRCode,
+			CurrentState: enum.PaymentStatusPending,
 			Amount:       123.45,
 		}
 
@@ -171,12 +171,12 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 		repo := contractmock.NewPaymentRepository(t)
 		repo.On("GetLastPaymentStatus", ctx, payment.OrderID).Once().Return(&payment, nil)
 
-		repo.On("UpdateStatus", ctx, payment.OrderID, enum.CONFIRMED).Once().Return(nil)
+		repo.On("UpdateStatus", ctx, payment.OrderID, enum.PaymentStatusConfirmed).Once().Return(nil)
 
 		sns := contractmock.NewSnsService(t)
 		sns.On("SendMessage", ctx, entity.PaymentMessage{
 			OrderId: 1,
-			Status:  enum.CONFIRMED,
+			Status:  enum.PaymentStatusConfirmed,
 		}).Once().Return(nil)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
@@ -193,8 +193,8 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 		payment := entity.Payment{
 			PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
 			OrderID:      1,
-			Type:         enum.QRCODE,
-			CurrentState: enum.PENDING,
+			Type:         enum.PaymentTypeQRCode,
+			CurrentState: enum.PaymentStatusPending,
 			Amount:       123.45,
 		}
 
@@ -203,7 +203,7 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 
 		repo := contractmock.NewPaymentRepository(t)
 		repo.On("GetLastPaymentStatus", ctx, payment.OrderID).Once().Return(&payment, nil)
-		repo.On("UpdateStatus", ctx, payment.OrderID, enum.CONFIRMED).Once().Return(expectedErr)
+		repo.On("UpdateStatus", ctx, payment.OrderID, enum.PaymentStatusConfirmed).Once().Return(expectedErr)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 		err := paymentUseCase.ConfirmedPaymentNotification(ctx, payment.OrderID)
@@ -219,23 +219,23 @@ func TestPaymentUseCase_PaymentNotification(t *testing.T) {
 		payment := entity.Payment{
 			PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
 			OrderID:      1,
-			Type:         enum.QRCODE,
-			CurrentState: enum.PENDING,
+			Type:         enum.PaymentTypeQRCode,
+			CurrentState: enum.PaymentStatusPending,
 			Amount:       123.45,
 		}
 
 		externalPaymentMock := contractmock.NewPaymentInterface[entity.QRCodePayment](t)
 		repo := contractmock.NewPaymentRepository(t)
 		repo.On("GetLastPaymentStatus", ctx, payment.OrderID).Once().Return(&payment, nil)
-		repo.On("UpdateStatus", ctx, 1, enum.CONFIRMED).Once().Return(nil)
+		repo.On("UpdateStatus", ctx, 1, enum.PaymentStatusConfirmed).Once().Return(nil)
 
 		sns := contractmock.NewSnsService(t)
 		sns.On("SendMessage", ctx, entity.PaymentMessage{
 			OrderId: 1,
-			Status:  enum.CONFIRMED,
+			Status:  enum.PaymentStatusConfirmed,
 		}).Once().Return(expectedErr)
 
-		repo.On("UpdateStatus", ctx, 1, enum.PENDING).Once().Return(nil)
+		repo.On("UpdateStatus", ctx, 1, enum.PaymentStatusPending).Once().Return(nil)
 
 		paymentUseCase := NewPaymentUseCase(repo, externalPaymentMock, sns, logger)
 		err := paymentUseCase.ConfirmedPaymentNotification(ctx, 1)
@@ -256,16 +256,16 @@ func lastPaymentStatusPayments() []paymentTest {
 			Payment: &entity.Payment{
 				PaymentID:    "65cf595b-19b9-431b-9a81-9818dec845f0",
 				OrderID:      1,
-				Type:         enum.QRCODE,
-				CurrentState: enum.PENDING,
+				Type:         enum.PaymentTypeQRCode,
+				CurrentState: enum.PaymentStatusPending,
 				Amount:       132.45,
 			},
-			Expected: enum.PENDING,
-			Type:     fmt.Sprintf("[%s status]", string(enum.PENDING)),
+			Expected: enum.PaymentStatusPending,
+			Type:     fmt.Sprintf("[%s status]", string(enum.PaymentStatusPending)),
 		},
 		{
 			Payment:  nil,
-			Expected: enum.PENDING,
+			Expected: enum.PaymentStatusPending,
 			Type:     "[empty status]",
 		},
 	}

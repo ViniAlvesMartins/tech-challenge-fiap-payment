@@ -38,11 +38,11 @@ func (p *PaymentUseCase) create(ctx context.Context, payment *entity.Payment) er
 func (p *PaymentUseCase) GetLastPaymentStatus(ctx context.Context, paymentId int) (enum.PaymentStatus, error) {
 	payment, err := p.repository.GetLastPaymentStatus(ctx, paymentId)
 	if err != nil {
-		return enum.PENDING, err
+		return enum.PaymentStatusPending, err
 	}
 
 	if payment == nil {
-		return enum.PENDING, nil
+		return enum.PaymentStatusPending, nil
 	}
 
 	return payment.CurrentState, nil
@@ -54,15 +54,15 @@ func (p *PaymentUseCase) CreateQRCode(ctx context.Context, order *entity.Order) 
 		return nil, err
 	}
 
-	if lastPaymentStatus == enum.CONFIRMED {
+	if lastPaymentStatus == enum.PaymentStatusConfirmed {
 		p.logger.Error(fmt.Sprintf("Last payment status: %s", lastPaymentStatus))
 		return nil, nil
 	}
 
 	payment := entity.Payment{
 		OrderID:      order.ID,
-		Type:         enum.QRCODE,
-		CurrentState: enum.PENDING,
+		Type:         enum.PaymentTypeQRCode,
+		CurrentState: enum.PaymentStatusPending,
 		Amount:       order.Amount,
 	}
 
@@ -77,11 +77,11 @@ func (p *PaymentUseCase) CreateQRCode(ctx context.Context, order *entity.Order) 
 }
 
 func (p *PaymentUseCase) ConfirmedPaymentNotification(ctx context.Context, id int) error {
-	return p.processPayment(ctx, id, enum.CONFIRMED, ErrConfirmingPayment)
+	return p.processPayment(ctx, id, enum.PaymentStatusConfirmed, ErrConfirmingPayment)
 }
 
 func (p *PaymentUseCase) CanceledPaymentNotification(ctx context.Context, id int) error {
-	return p.processPayment(ctx, id, enum.CANCELED, ErrCancelingPayment)
+	return p.processPayment(ctx, id, enum.PaymentStatusCanceled, ErrCancelingPayment)
 }
 
 func (p *PaymentUseCase) processPayment(ctx context.Context, id int, status enum.PaymentStatus, operationErr error) error {

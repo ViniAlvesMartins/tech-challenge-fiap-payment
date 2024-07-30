@@ -36,7 +36,7 @@ func (o *OrderUseCase) GetById(id int) (*entity.Order, error) {
 	return &entity.Order{
 		ID:          orderServiceResponse.Data.ID,
 		ClientId:    orderServiceResponse.Data.ClientId,
-		StatusOrder: orderServiceResponse.Data.StatusOrder,
+		OrderStatus: orderServiceResponse.Data.OrderStatus,
 		Amount:      orderServiceResponse.Data.Amount,
 		CreatedAt:   orderServiceResponse.Data.CreatedAt,
 	}, nil

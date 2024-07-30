@@ -15,6 +15,7 @@ type Config struct {
 	SnsAccessKey           string `envconfig:"sns_access_key"`
 	UpdateOrderStatusTopic string `envconfig:"update_order_status_topic"`
 	ProductionFailedQueue  string `envconfig:"production_failed_queue"`
+	OrderCreatedQueue      string `envconfig:"order_created_queue"`
 	SnsSecretAccess        string `envconfig:"sns_secret_access"`
 
 	OrdersURL string `envconfig:"orders_url"`

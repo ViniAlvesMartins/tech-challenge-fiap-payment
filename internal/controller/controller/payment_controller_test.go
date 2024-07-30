@@ -23,13 +23,13 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 		order := &entity.Order{
 			ID:          1,
 			ClientId:    nil,
-			StatusOrder: enum.AWAITING_PAYMENT,
+			OrderStatus: enum.OrderStatusAwaitingPayment,
 			Amount:      123.45,
 			CreatedAt:   time.Now(),
 		}
 
 		qrCode := &entity.QRCodePayment{QRCode: "qr_data"}
-		body := input.PaymentDto{OrderId: order.ID, Type: string(enum.QRCODE)}
+		body := input.PaymentDto{OrderId: order.ID, Type: string(enum.PaymentTypeQRCode)}
 		jsonBody, _ := json.Marshal(body)
 		bodyReader := bytes.NewReader(jsonBody)
 
@@ -88,7 +88,7 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 		orderUseCaseMock := contractmock.NewOrderUseCase(t)
 		orderUseCaseMock.On("GetById", 1).Return(nil, expectedErr).Once()
 
-		body := input.PaymentDto{OrderId: 1, Type: string(enum.QRCODE)}
+		body := input.PaymentDto{OrderId: 1, Type: string(enum.PaymentTypeQRCode)}
 		jsonBody, _ := json.Marshal(body)
 		bodyReader := bytes.NewReader(jsonBody)
 
@@ -115,7 +115,7 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 
 		paymentUseCaseMock := contractmock.NewPaymentUseCase(t)
 
-		body := input.PaymentDto{OrderId: 1, Type: string(enum.QRCODE)}
+		body := input.PaymentDto{OrderId: 1, Type: string(enum.PaymentTypeQRCode)}
 		jsonBody, _ := json.Marshal(body)
 		bodyReader := bytes.NewReader(jsonBody)
 
@@ -138,12 +138,12 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 		order := &entity.Order{
 			ID:          1,
 			ClientId:    nil,
-			StatusOrder: enum.AWAITING_PAYMENT,
+			OrderStatus: enum.OrderStatusAwaitingPayment,
 			Amount:      123.45,
 			CreatedAt:   time.Now(),
 		}
 
-		body := input.PaymentDto{OrderId: order.ID, Type: string(enum.QRCODE)}
+		body := input.PaymentDto{OrderId: order.ID, Type: string(enum.PaymentTypeQRCode)}
 		jsonBody, _ := json.Marshal(body)
 		bodyReader := bytes.NewReader(jsonBody)
 
@@ -173,12 +173,12 @@ func TestPaymentController_CreatePayment(t *testing.T) {
 		order := &entity.Order{
 			ID:          1,
 			ClientId:    nil,
-			StatusOrder: enum.AWAITING_PAYMENT,
+			OrderStatus: enum.OrderStatusAwaitingPayment,
 			Amount:      123.45,
 			CreatedAt:   time.Now(),
 		}
 
-		body := input.PaymentDto{OrderId: order.ID, Type: string(enum.QRCODE)}
+		body := input.PaymentDto{OrderId: order.ID, Type: string(enum.PaymentTypeQRCode)}
 		jsonBody, _ := json.Marshal(body)
 		bodyReader := bytes.NewReader(jsonBody)
 
@@ -219,7 +219,7 @@ func TestPaymentController_GetLastPaymentStatus(t *testing.T) {
 		orderUseCaseMock := contractmock.NewOrderUseCase(t)
 
 		paymentUseCaseMock := contractmock.NewPaymentUseCase(t)
-		paymentUseCaseMock.On("GetLastPaymentStatus", r.Context(), 1).Return(enum.PENDING, nil)
+		paymentUseCaseMock.On("GetLastPaymentStatus", r.Context(), 1).Return(enum.PaymentStatusPending, nil)
 
 		c := NewPaymentController(paymentUseCaseMock, loggerMock, orderUseCaseMock)
 		c.GetLastPaymentStatus(w, r)
@@ -228,7 +228,7 @@ func TestPaymentController_GetLastPaymentStatus(t *testing.T) {
 			Error: "",
 			Data: GetLastPaymentStatus{
 				OrderId:       1,
-				PaymentStatus: enum.PENDING,
+				PaymentStatus: enum.PaymentStatusPending,
 			},
 		})
 
@@ -274,7 +274,7 @@ func TestPaymentController_GetLastPaymentStatus(t *testing.T) {
 		orderUseCaseMock := contractmock.NewOrderUseCase(t)
 
 		paymentUseCaseMock := contractmock.NewPaymentUseCase(t)
-		paymentUseCaseMock.On("GetLastPaymentStatus", r.Context(), 1).Return(enum.PENDING, errors.New("error getting last payment status"))
+		paymentUseCaseMock.On("GetLastPaymentStatus", r.Context(), 1).Return(enum.PaymentStatusPending, errors.New("error getting last payment status"))
 
 		c := NewPaymentController(paymentUseCaseMock, loggerMock, orderUseCaseMock)
 		c.GetLastPaymentStatus(w, r)

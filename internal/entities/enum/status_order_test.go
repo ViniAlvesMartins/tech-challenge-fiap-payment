@@ -7,7 +7,7 @@ import (
 
 func TestValidateStatus(t *testing.T) {
 	t.Run("validate status successfully", func(t *testing.T) {
-		assert.True(t, ValidateStatus(string(AWAITING_PAYMENT)))
+		assert.True(t, ValidateStatus(string(OrderStatusAwaitingPayment)))
 	})
 
 	t.Run("invalid order status", func(t *testing.T) {

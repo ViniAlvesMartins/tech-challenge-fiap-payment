@@ -20,7 +20,7 @@ func TestOrderUseCase_GetById(t *testing.T) {
 		order := &entity.Order{
 			ID:          1,
 			ClientId:    &clientID,
-			StatusOrder: "PENDING",
+			OrderStatus: "PENDING",
 			Amount:      123.4,
 			CreatedAt:   time.Now(),
 		}

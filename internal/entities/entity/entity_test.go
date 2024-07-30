@@ -23,7 +23,7 @@ func TestOrder(t *testing.T) {
 		o := Order{
 			ID:          1,
 			ClientId:    nil,
-			StatusOrder: enum.AWAITING_PAYMENT,
+			OrderStatus: enum.OrderStatusAwaitingPayment,
 			Amount:      123.45,
 			CreatedAt:   time.Now(),
 		}

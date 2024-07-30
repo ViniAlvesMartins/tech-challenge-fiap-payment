@@ -28,7 +28,7 @@ func TestOrderService_GetById(t *testing.T) {
 			Data: &entity.Order{
 				ID:          1,
 				ClientId:    nil,
-				StatusOrder: enum.AWAITING_PAYMENT,
+				OrderStatus: enum.OrderStatusAwaitingPayment,
 				Amount:      123.45,
 				CreatedAt:   time.Now(),
 			},
@@ -61,7 +61,7 @@ func TestOrderService_GetById(t *testing.T) {
 			Data: &entity.Order{
 				ID:          1,
 				ClientId:    nil,
-				StatusOrder: enum.AWAITING_PAYMENT,
+				OrderStatus: enum.OrderStatusAwaitingPayment,
 				Amount:      123.45,
 				CreatedAt:   time.Now(),
 			},

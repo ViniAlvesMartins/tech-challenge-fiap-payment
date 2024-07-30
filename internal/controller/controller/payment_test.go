@@ -31,7 +31,7 @@ func iSendAPostRequest() error {
 	}
 
 	requestBody = input.PaymentDto{
-		Type:    string(enum.QRCODE),
+		Type:    string(enum.PaymentTypeQRCode),
 		OrderId: 1,
 	}
 

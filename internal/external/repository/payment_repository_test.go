@@ -34,8 +34,8 @@ func TestPaymentRepository_Create(t *testing.T) {
 		p := entity.Payment{
 			PaymentID:    paymentId.String(),
 			OrderID:      1,
-			Type:         enum.QRCODE,
-			CurrentState: enum.PENDING,
+			Type:         enum.PaymentTypeQRCode,
+			CurrentState: enum.PaymentStatusPending,
 			Amount:       123.45,
 		}
 
@@ -60,8 +60,8 @@ func TestPaymentRepository_Create(t *testing.T) {
 		p := entity.Payment{
 			PaymentID:    paymentId.String(),
 			OrderID:      1,
-			Type:         enum.QRCODE,
-			CurrentState: enum.PENDING,
+			Type:         enum.PaymentTypeQRCode,
+			CurrentState: enum.PaymentStatusPending,
 			Amount:       123.45,
 		}
 
@@ -83,8 +83,8 @@ func TestPaymentRepository_GetLastPaymentStatus(t *testing.T) {
 		p := &entity.Payment{
 			PaymentID:    paymentId.String(),
 			OrderID:      1,
-			Type:         enum.QRCODE,
-			CurrentState: enum.PENDING,
+			Type:         enum.PaymentTypeQRCode,
+			CurrentState: enum.PaymentStatusPending,
 			Amount:       123.45,
 		}
 
@@ -119,8 +119,8 @@ func TestPaymentRepository_GetLastPaymentStatus(t *testing.T) {
 		p := &entity.Payment{
 			PaymentID:    paymentId.String(),
 			OrderID:      1,
-			Type:         enum.QRCODE,
-			CurrentState: enum.PENDING,
+			Type:         enum.PaymentTypeQRCode,
+			CurrentState: enum.PaymentStatusPending,
 			Amount:       123.45,
 		}
 
@@ -145,8 +145,8 @@ func TestPaymentRepository_GetLastPaymentStatus(t *testing.T) {
 		p := &entity.Payment{
 			PaymentID:    paymentId.String(),
 			OrderID:      1,
-			Type:         enum.QRCODE,
-			CurrentState: enum.PENDING,
+			Type:         enum.PaymentTypeQRCode,
+			CurrentState: enum.PaymentStatusPending,
 			Amount:       123.45,
 		}
 
@@ -182,7 +182,7 @@ func TestPaymentRepository_UpdateStatus(t *testing.T) {
 		db.On("UpdateItem", ctx, mock.AnythingOfType("*dynamodb.UpdateItemInput")).Once().Return(&dynamodb.UpdateItemOutput{}, nil)
 
 		repo := NewPaymentRepository(db, logger, uuidMock)
-		err := repo.UpdateStatus(ctx, 1, enum.CONFIRMED)
+		err := repo.UpdateStatus(ctx, 1, enum.PaymentStatusConfirmed)
 
 		assert.Nil(t, err)
 	})
@@ -198,7 +198,7 @@ func TestPaymentRepository_UpdateStatus(t *testing.T) {
 		db.On("UpdateItem", ctx, mock.AnythingOfType("*dynamodb.UpdateItemInput")).Once().Return(nil, expectedErr)
 
 		repo := NewPaymentRepository(db, logger, uuidMock)
-		err := repo.UpdateStatus(ctx, 1, enum.CONFIRMED)
+		err := repo.UpdateStatus(ctx, 1, enum.PaymentStatusConfirmed)
 
 		assert.ErrorIs(t, expectedErr, err)
 	})

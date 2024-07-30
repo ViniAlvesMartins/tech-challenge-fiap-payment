@@ -31,7 +31,7 @@ func (f *FailedProductHandler) Handle(ctx context.Context, b []byte) error {
 		return err
 	}
 
-	if message.Status != string(enum.CANCELED) {
+	if message.Status != string(enum.OrderStatusCanceled) {
 		return nil
 	}
 

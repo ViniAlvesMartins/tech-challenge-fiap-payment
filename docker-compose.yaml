@@ -16,11 +16,11 @@ services:
       - 8081:8081
     networks:
       - dev-networks
-  dev-app-payment-worker:
-    container_name: worker.ze-burger-payments.dev
+  dev-app-payment-production-failed-worker:
+    container_name: worker.ze-burger-payments-production-failed.dev
     env_file: .env
     command: >
-      sh -c "go run cmd/worker/main.go"
+      sh -c "go run cmd/worker/production_failed_worker/main.go"
     build:
       dockerfile: ./infra/docker/local/Dockerfile
       context: ./

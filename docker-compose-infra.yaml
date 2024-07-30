@@ -30,10 +30,12 @@ services:
       - -c
       - |
         aws --endpoint-url=http://payment-localstack:4566 dynamodb create-table --cli-input-json '{"TableName":"payments", "KeySchema":[{"AttributeName":"order_id","KeyType":"HASH"}], "AttributeDefinitions":[ {"AttributeName":"order_id","AttributeType":"N"}], "BillingMode":"PAY_PER_REQUEST"}' --region us-east-1 --output table | cat
-        aws --endpoint-url=http://payment-localstack:4566 sns create-topic --name update_order_status --region us-east-1 --output table | cat
-        aws --endpoint-url=http://payment-localstack:4566 sqs create-queue --queue-name production-failed-queue --region us-east-1 --output table | cat
-        aws --endpoint-url=http://payment-localstack:4566 sqs list-queues --region us-east-1 --output table | cat
-        aws --endpoint-url=http://payment-localstack:4566 sns subscribe --topic-arn arn:aws:sns:us-east-1:000000000000:update_order_status --protocol sqs --notification-endpoint arn:aws:sqs:us-east-1:000000000000:production-failed-queue --region us-east-1 --output table | cat
+        aws --endpoint-url=http://payment-localstack:4566 sns create-topic --name update_order_status-topic --region us-east-1 --output table | cat
+        aws --endpoint-url=http://payment-localstack:4566 sns create-topic --name order_created-topic --region us-east-1 --output table | cat
+        aws --endpoint-url=http://payment-localstack:4566 sqs create-queue --queue-name payment_production_failed-queue --region us-east-1 --output table | cat        
+        aws --endpoint-url=http://payment-localstack:4566 sqs create-queue --queue-name payment_order_created-queue --region us-east-1 --output table | cat        
+        aws --endpoint-url=http://payment-localstack:4566 sns subscribe --topic-arn arn:aws:sns:us-east-1:000000000000:update_order_status-topic --protocol sqs --notification-endpoint arn:aws:sqs:us-east-1:000000000000:payment_production_failed-queue --region us-east-1 --output table | cat
+        aws --endpoint-url=http://payment-localstack:4566 sns subscribe --topic-arn arn:aws:sns:us-east-1:000000000000:order_created-topic --protocol sqs --notification-endpoint arn:aws:sqs:us-east-1:000000000000:payment_order_created-queue --region us-east-1 --output table | cat
     networks:
       - dev-networks
 
