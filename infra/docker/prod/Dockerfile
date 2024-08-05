@@ -11,6 +11,6 @@ COPY . .
 EXPOSE 8081
 
 RUN go build -o ./cmd/api/main ./cmd/api/main.go
-RUN go build -o ./cmd/worker/main ./cmd/worker/main.go
+RUN go build -o ./cmd/worker/production_failed_worker/main ./cmd/worker/production_failed_worker/main.go
 
 CMD [ "./cmd/api/main" ]
