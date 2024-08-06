@@ -1,37 +1,25 @@
-services:
-  payment-postgres:
-    container_name: postgres.ze-burguer-payment
-    image: postgres:latest
-    env_file:
-      - .env
-    environment:
-      POSTGRES_DB: $DATABASE_NAME
-      POSTGRES_USER: $DATABASE_USERNAME
-      POSTGRES_PASSWORD: $DATABASE_PASSWORD
-    ports:
-      - 5432:5432
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - fullstack
-  app-ze-burger-payment:
-    build:
-      dockerfile: ./infra/prod/Dockerfile
-      context: .
-    image: golang
-    container_name: app-ze-burguer
-    ports:
-      - 8080:8080
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - fullstack
+version: '3.9'
 
-networks:
-  fullstack:
-    driver: bridge
-  
+include:
+  - "docker-compose-network.yaml"
+
+services:
+  prod-app-payment:
+    container_name: api.ze-burger-payments.prod
+    env_file: .env
+    build:
+      dockerfile: ./infra/docker/prod/Dockerfile
+      context: ./
+    ports:
+      - 8081:8081
+    networks:
+      - dev-networks
+  prod-app-payment-production-failed-worker:
+    container_name: worker.ze-burger-payments-production-failed.prod
+    env_file: .env
+    command: ["./cmd/worker/production_failed_worker/main"]
+    build:
+      dockerfile: ./infra/docker/prod/Dockerfile
+      context: ./
+    networks:
+      - dev-networks

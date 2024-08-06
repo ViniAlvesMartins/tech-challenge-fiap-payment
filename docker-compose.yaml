@@ -1,18 +1,14 @@
 version: '3.9'
 
+include:
+  - "docker-compose-network.yaml"
+
 services:
-  dynamodb-local:
-    image: amazon/dynamodb-local:latest
-    container_name: dynamodb-local
-    ports:
-      - "8000:8000"
-    networks:
-      - dev-networks
   dev-app-payment:
-    container_name: app.ze-burger-payments.dev
+    container_name: api.ze-burger-payments.dev
     env_file: .env
     build:
-      dockerfile: ./infra/local/Dockerfile
+      dockerfile: ./infra/docker/local/Dockerfile
       context: ./
     volumes:
       - .:/app
@@ -20,6 +16,15 @@ services:
       - 8081:8081
     networks:
       - dev-networks
-
-networks:
-  dev-networks:
+  dev-app-payment-production-failed-worker:
+    container_name: worker.ze-burger-payments-production-failed.dev
+    env_file: .env
+    command: >
+      sh -c "go run cmd/worker/production_failed_worker/main.go"
+    build:
+      dockerfile: ./infra/docker/local/Dockerfile
+      context: ./
+    volumes:
+      - .:/app
+    networks:
+      - dev-networks

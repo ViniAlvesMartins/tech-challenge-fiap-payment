@@ -1,11 +1,17 @@
 build:
 	docker-compose build
 
-run-dev:
-	docker-compose up
+run-app:
+	docker-compose up dev-app-payment
 
-run-prod:
-	docker-compose -f docker-compose.prod.yaml up
+run-worker:
+	docker-compose up dev-app-payment-worker
+
+start-infra:
+	docker-compose -f docker-compose-infra.yaml up
+
+swagger:
+	docker-compose run dev-app-payment swag init -g internal/external/handler/http_server/app.go -o doc/swagger/
 
 mocks:
 	docker-compose run dev-app-payment go generate ./...

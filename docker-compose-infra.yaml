@@ -1,0 +1,66 @@
+version: '3.9'
+
+include:
+  - "docker-compose-network.yaml"
+
+services:
+  payment-localstack:
+    image: localstack/localstack:latest
+    container_name: payment-localstack
+    environment:
+      - SERVICES=sqs,sns,dynamodb
+      - AWS_DEFAULT_REGION=us-east-1
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - dev-networks
+
+  payment-aws-cli:
+    image: amazon/aws-cli
+    container_name: payment-aws-cli
+    depends_on:
+      - payment-localstack
+    env_file: .env
+    entrypoint:
+      - sh
+      - -c
+      - |
+        aws --endpoint-url=http://payment-localstack:4566 dynamodb create-table --cli-input-json '{"TableName":"payments", "KeySchema":[{"AttributeName":"order_id","KeyType":"HASH"}], "AttributeDefinitions":[ {"AttributeName":"order_id","AttributeType":"N"}], "BillingMode":"PAY_PER_REQUEST"}' --region us-east-1 --output table | cat
+        aws --endpoint-url=http://payment-localstack:4566 sns create-topic --name update_order_status-topic --region us-east-1 --output table | cat
+        aws --endpoint-url=http://payment-localstack:4566 sns create-topic --name order_created-topic --region us-east-1 --output table | cat
+        aws --endpoint-url=http://payment-localstack:4566 sqs create-queue --queue-name payment_production_failed-queue --region us-east-1 --output table | cat        
+        aws --endpoint-url=http://payment-localstack:4566 sqs create-queue --queue-name payment_order_created-queue --region us-east-1 --output table | cat        
+        aws --endpoint-url=http://payment-localstack:4566 sns subscribe --topic-arn arn:aws:sns:us-east-1:000000000000:update_order_status-topic --protocol sqs --notification-endpoint arn:aws:sqs:us-east-1:000000000000:payment_production_failed-queue --region us-east-1 --output table | cat
+        aws --endpoint-url=http://payment-localstack:4566 sns subscribe --topic-arn arn:aws:sns:us-east-1:000000000000:order_created-topic --protocol sqs --notification-endpoint arn:aws:sqs:us-east-1:000000000000:payment_order_created-queue --region us-east-1 --output table | cat
+    networks:
+      - dev-networks
+
+  payment-dynamodb-admin:
+    image: aaronshaf/dynamodb-admin
+    ports:
+      - "8001:8001"
+    environment:
+      DYNAMO_ENDPOINT: "http://payment-localstack:4566"
+      AWS_REGION: "us-east-1"
+      AWS_ACCESS_KEY_ID: foobar
+      AWS_SECRET_ACCESS_KEY: foobar
+    depends_on:
+      - payment-localstack
+    networks:
+      - dev-networks
+
+  mock-order-server:
+    container_name: app.ze-burger-payments.orders-mock.dev
+    image: mockoon/cli:latest
+    command: [ "--data", "data", "--port", "8002" ]
+    ports:
+      - 8002:8002
+    volumes:
+      - ./orders-mock.json:/data:readonly
+    networks:
+      - dev-networks
+
