@@ -3,6 +3,9 @@ package repository
 import (
 	"context"
 	"errors"
+	"log/slog"
+	"strconv"
+
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-common/uuid"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
@@ -11,8 +14,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/aws/aws-sdk-go/aws"
-	"log/slog"
-	"strconv"
 )
 
 const table = "payments"

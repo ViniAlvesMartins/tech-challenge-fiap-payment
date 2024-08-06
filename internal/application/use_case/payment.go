@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
+
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/entity"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
-	"log/slog"
 )
 
 var (
@@ -86,8 +87,13 @@ func (p *PaymentUseCase) CanceledPaymentNotification(ctx context.Context, id int
 
 func (p *PaymentUseCase) processPayment(ctx context.Context, id int, status enum.PaymentStatus, operationErr error) error {
 	lastStatus, err := p.GetLastPaymentStatus(ctx, id)
+
 	if err != nil {
 		return errors.Join(operationErr, err)
+	}
+
+	if lastStatus != enum.PaymentStatusPending {
+		return nil
 	}
 
 	if err = p.repository.UpdateStatus(ctx, id, status); err != nil {
@@ -100,7 +106,7 @@ func (p *PaymentUseCase) processPayment(ctx context.Context, id int, status enum
 	}
 
 	if err = p.snsService.SendMessage(ctx, payment); err != nil {
-		// rollback payment status
+		p.logger.Error(fmt.Sprintf("rollback payment status: %s", lastStatus))
 		if err = p.repository.UpdateStatus(ctx, id, lastStatus); err != nil {
 			return errors.Join(operationErr, err)
 		}

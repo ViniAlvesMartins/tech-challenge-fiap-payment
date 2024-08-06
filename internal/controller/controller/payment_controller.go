@@ -2,16 +2,18 @@ package controller
 
 import (
 	"encoding/json"
-	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
 	"strconv"
 
+	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/entities/enum"
+
 	"github.com/gorilla/mux"
+
+	"log/slog"
+	"net/http"
 
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/application/contract"
 	"github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/controller/serializer"
 	dto "github.com/ViniAlvesMartins/tech-challenge-fiap-payment/internal/controller/serializer/input"
-	"log/slog"
-	"net/http"
 )
 
 type PaymentController struct {
@@ -100,6 +102,7 @@ func (p *PaymentController) CreatePayment(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	order.ID = paymentDTO.OrderId
 	qrCode, err := p.paymentUseCase.CreateQRCode(r.Context(), order)
 
 	if err != nil {
