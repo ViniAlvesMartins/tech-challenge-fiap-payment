@@ -91,11 +91,7 @@ func (p *PaymentUseCase) processPayment(ctx context.Context, id int, status enum
 	if err != nil {
 		return errors.Join(operationErr, err)
 	}
-
-	if lastStatus != enum.PaymentStatusPending {
-		return nil
-	}
-
+	
 	if err = p.repository.UpdateStatus(ctx, id, status); err != nil {
 		return errors.Join(operationErr, err)
 	}
@@ -106,7 +102,7 @@ func (p *PaymentUseCase) processPayment(ctx context.Context, id int, status enum
 	}
 
 	if err = p.snsService.SendMessage(ctx, payment); err != nil {
-		p.logger.Error(fmt.Sprintf("rollback payment status: %s", lastStatus))
+		p.logger.Error(fmt.Sprintf("rollback payment status: %s", lastStatus), slog.Any("error", err))
 		if err = p.repository.UpdateStatus(ctx, id, lastStatus); err != nil {
 			return errors.Join(operationErr, err)
 		}

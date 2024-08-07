@@ -42,7 +42,7 @@ func main() {
 	orderUseCase := use_case.NewOrderUseCase(orderService, logger)
 
 	paymentRepository := repository.NewPaymentRepository(db, logger, loadUUID())
-	snsConnection, err := sns.NewConnection(ctx, cfg.UpdateOrderStatusTopic)
+	snsConnection, err := sns.NewConnection(ctx, cfg.UpdatePaymentStatusTopic)
 	if err != nil {
 		logger.Error("error connecting to sns", err)
 		panic(err)

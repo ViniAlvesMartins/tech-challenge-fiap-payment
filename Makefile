@@ -5,7 +5,7 @@ run-app:
 	docker-compose up dev-app-payment
 
 run-worker:
-	docker-compose up dev-app-payment-worker
+	docker-compose up dev-app-payment-production-failed-worker
 
 start-infra:
 	docker-compose -f docker-compose-infra.yaml up
