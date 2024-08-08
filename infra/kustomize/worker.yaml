@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ze-burguer-payment-worker
+spec:
+  selector:
+    matchLabels:
+      app:  ze-burguer-payment-worker
+  template:
+    metadata:
+      labels:
+        app: ze-burguer-payment-worker
+    spec:
+      containers:
+        - name: ze-burguer-payment-worker
+          image: marcosilva/ze_burguer:latest
+          command:
+           - /cmd/worker/production_failed_worker/main
+          envFrom:
+          - configMapRef:
+              name: ze-burguer-payment
+          resources:
+            requests:
+              cpu: "30m"
+            limits:
+              cpu: "30m"
