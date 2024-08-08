@@ -5,7 +5,7 @@ run-app:
 	docker-compose up dev-app-payment
 
 run-worker:
-	docker-compose up dev-app-payment-worker
+	docker-compose up dev-app-payment-production-failed-worker
 
 start-infra:
 	docker-compose -f docker-compose-infra.yaml up
@@ -17,7 +17,7 @@ mocks:
 	docker-compose run dev-app-payment go generate ./...
 
 test:
-	docker-compose run dev-app-payment go test ./...
+	docker-compose run dev-app-payment go test ./... -v
 
 test-coverage:
 	docker-compose run dev-app-payment go test -coverprofile cover.out `go list ./... | egrep -v '(/doc|/infra|/src/pkg/uuid/mock|/src/application/contract/mock|/src/external/handler/http_server|/api)$\'` && go tool cover -html=cover.out
