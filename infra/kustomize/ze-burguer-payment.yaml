@@ -72,5 +72,6 @@ metadata:
   name: ze-burguer-payment
 data:
   ORDERS_URL: "http://ze-burguer.tech-challenge.svc.cluster.local"
-  UPDATE_ORDER_STATUS_TOPIC: "arn:aws:sns:us-east-1:435304418663:update_order_status-topic"
-  PRODUCTION_FAILED_QUEUE: "http://sqs.us-east-1.amazonaws.com/435304418663/payment_production_failed-queue"
+  PAYMENT_STATUS_UPDATED_TOPIC: "arn:aws:sns:us-east-1:435304418663:payment_status_updated-topic"
+  PRODUCTION_FAILED_TOPIC: "arn:aws:sns:us-east-1:435304418663:production_failed-topic"
+
