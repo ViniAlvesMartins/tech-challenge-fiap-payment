@@ -16,6 +16,8 @@ Aplicação responsável pela gestão de pedidos da hamburgueria Zé do Burguer 
 
 [Stack](#stack-utilizada)
 
+[SAGA](#saga-coreografia)
+
 [Instalação Docker](#instalação-docker)
 
 [Instalação Kubernetes](#instalação-kubernetes)
@@ -78,6 +80,11 @@ Flexibilidade de Schema: DynamoDB permite ajustes no schema das tabelas sem a ne
 
 ![Arquitetura_cloud_v2_detail](./doc/arquitetura/cloud_arch_v2_detail.png)
 
+---
+
+## Saga coreografia
+
+O padrão SAGA coreografado é vantajoso para aplicações pequenas por sua simplicidade, desacoplamento de serviços, escalabilidade, resiliência e flexibilidade. Ele evita a complexidade de um orquestrador central, facilitando a manutenção e evolução independente dos serviços. A comunicação entre serviços por eventos promove baixo acoplamento e resiliência, permitindo que cada serviço escale e evolua separadamente. Em uma aplicação de hamburguer, por exemplo, os serviços de pedidos, inventário e pagamentos podem coordenar suas ações por meio de eventos sem um controlador central.
 
 ---
 
