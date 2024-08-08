@@ -82,7 +82,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./infra/prod/Dockerfile
+          file: ./infra/docker/prod/Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/ze_burguer_payment:latest
 
@@ -102,4 +102,4 @@ jobs:
     - name: Deploy App to EKS
       if: steps.config-kubectl.outcome == 'success'
       run: |
-        kubectl apply -k kustomize/
+        kubectl apply -k infra/kustomize/
