@@ -102,4 +102,4 @@ jobs:
     - name: Deploy App to EKS
       if: steps.config-kubectl.outcome == 'success'
       run: |
-        kubectl apply -k kustomize/
+        kubectl apply -k infra/kustomize/
