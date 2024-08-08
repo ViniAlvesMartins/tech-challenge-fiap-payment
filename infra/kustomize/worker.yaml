@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: ze-burguer-payment-worker
-          image: marcosilva/ze_burguer:latest
+          image: marcosilva/ze_burguer_payment:latest
           command:
            - /cmd/worker/production_failed_worker/main
           envFrom:
