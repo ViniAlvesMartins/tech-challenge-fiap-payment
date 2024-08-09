@@ -28,6 +28,8 @@ Aplicação responsável pela gestão de pedidos da hamburgueria Zé do Burguer 
 
 [OWASP ZAP](#owasp-zap)
 
+[Relatorio RIPD](#Relatorio-RIPD)
+
 ---
 
 ## Arquitetura
@@ -177,3 +179,7 @@ Deployments
 
 Relatório se encontra na pasta ./doc/relatorio/payments-report.html
 ![OWASP ZAP](./doc/relatorio/owasp.png)
+
+## Relatorio RIPD
+
+![Relatorio RIPD](./doc/RIPD.docx)
