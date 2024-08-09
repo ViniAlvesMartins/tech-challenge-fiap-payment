@@ -26,6 +26,8 @@ Aplicação responsável pela gestão de pedidos da hamburgueria Zé do Burguer 
 
 [Sonar](#sonar)
 
+[OWASP ZAP](#owasp-zap)
+
 ---
 
 ## Arquitetura
@@ -172,3 +174,6 @@ Deployments
 ## Sonar
 
 ![Sonar](./doc/sonar.png)
+
+Relatório se encontra na pasta ./doc/relatorio/payments-report.html
+![OWASP ZAP](./doc/relatorio/owasp.png)
